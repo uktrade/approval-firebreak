@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "webpack-bundle-tracker": "^1.0.0-alpha.1"
+  },
+  "dependencies": {
+    "govuk-frontend": "^3.11.0"
+  }
+}

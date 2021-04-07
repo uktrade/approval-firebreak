@@ -1,0 +1,5 @@
+# Constrain to base requirements
+-r ../requirements/base.txt
+
+# Development tools
+pip-tools>=6.0.1

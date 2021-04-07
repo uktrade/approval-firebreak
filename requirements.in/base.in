@@ -1,0 +1,23 @@
+# Django tools
+django>=3.1.6
+django-simple-history
+django-settings-export
+django-environ
+django-fsm
+
+# DIT dependencies
+django-staff-sso-client>=3.1.0
+
+# Operational dependencies
+sentry-sdk>=0.20.2
+celery
+
+# Front end
+django-webpack-loader
+
+# DB
+psycogreen
+psycopg2
+
+# Notifications
+notifications-python-client
