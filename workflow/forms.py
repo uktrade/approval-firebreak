@@ -8,11 +8,21 @@ from workflow.models import (
 
 
 class RejectForm(forms.Form):
-    details = forms.CharField(widget=forms.Textarea(attrs={"rows":5, "cols":20}))
+    details = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "rows": 5, "cols": 20,
+            "class": "govuk-textarea",
+        })
+    )
 
 
 class RequestChangesForm(forms.Form):
-    details = forms.CharField(widget=forms.Textarea(attrs={"rows":5, "cols":20}))
+    details = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "rows": 5, "cols": 20,
+            "class": "govuk-textarea",
+        })
+    )
 
 
 class ApprovalForm(forms.Form):

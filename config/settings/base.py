@@ -81,7 +81,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "authbroker_client.middleware.ProtectAllViewsMiddleware",
+    #"authbroker_client.middleware.ProtectAllViewsMiddleware",
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
@@ -164,8 +164,8 @@ STATICFILES_DIRS = (
 )
 
 AUTHENTICATION_BACKENDS = [
-    #'django.contrib.auth.backends.ModelBackend',
-    "user.backends.CustomAuthbrokerBackend",
+    'django.contrib.auth.backends.ModelBackend',
+    #"user.backends.CustomAuthbrokerBackend",
 ]
 
 # Application paths outside of SSO protection

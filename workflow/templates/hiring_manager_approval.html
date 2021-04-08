@@ -28,33 +28,5 @@
         <input class="govuk-button" data-module="govuk-button" type="submit" value="Approve">
     </form>
 
-
-    <details class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">
-              Request changes
-            </span>
-        </summary>
-        <div class="govuk-details__text">
-            <form action="" method="post" novalidate>
-                {% csrf_token %}
-                {% include "includes/govt_uk_form.html" with form=request_changes_form %}
-                <input class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" value="Request changes">
-            </form>
-        </div>
-    </details>
-    <details class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">
-              Reject this requirement
-            </span>
-        </summary>
-        <div class="govuk-details__text">
-            <form action="" method="post" novalidate>
-                {% csrf_token %}
-                {% include "includes/govt_uk_form.html" with form=reject_form %}
-                <input class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit" value="Reject">
-            </form>
-        </div>
-    </details>
+    {% include "includes/request_changes_reject.html" %}
 {% endblock %}

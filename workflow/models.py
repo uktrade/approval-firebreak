@@ -34,6 +34,49 @@ class Approval(models.Model):
         choices=APPROVAL_CHOICES,
     )
 
+SUBMITTED = "submitted"
+CHIEF_APPROVAL_REQUIRED = "chief_approval_required"
+BUS_OPS_APPROVAL_REQUIRED = "bus_ops_approval_required"
+IN_PROGRESS = "in_progress"
+DIRECTOR_APPROVED = "director_approved"
+DG_COO_APPROVED = "dg_coo_approved"
+COMPLETE = "complete"
+
+REQUIREMENT_STATES = {
+    SUBMITTED: {
+        "nice_name": "Submitted",
+        "permissions": ["can_give_hiring_manager_approval", ]
+    },
+    CHIEF_APPROVAL_REQUIRED: {
+        "nice_name": "Chief approval required",
+        "permissions": ["can_give_chief_approval", ]
+    },
+    BUS_OPS_APPROVAL_REQUIRED: {
+        "nice_name": "Business Operation approval required",
+        "permissions": ["can_give_bus_ops_approval", ]
+    },
+    IN_PROGRESS: {
+        "nice_name": "In progress",
+        "permissions": [
+            "can_give_commercial_approval",
+            "can_give_finance_approval",
+            "can_give_hr_approval",
+        ]
+    },
+    DIRECTOR_APPROVED: {
+        "nice_name": "Needs DO COO approval",
+        "permissions": [
+            "can_give_director_approval",
+        ]
+    },
+    DG_COO_APPROVED: {
+        "nice_name": "Needs hiring manager approval",
+        "permissions": [
+            "can_give_director_approval",
+        ]
+    },
+}
+
 
 class Requirement(models.Model):
     uuid = models.UUIDField(
@@ -74,13 +117,17 @@ class Requirement(models.Model):
     )
 
     @property
+    def nice_name(self):
+        return REQUIREMENT_STATES[self.state]["nice_name"]
+
+    @property
     def has_departmental_approval(self):
         if self.finance_approval and self.hr_approval and self.commercial_approval:
             return True
 
         return False
 
-    @transition(field=state, source='submitted', target='chief_approval_required')
+    @transition(field=state, source=SUBMITTED, target=CHIEF_APPROVAL_REQUIRED)
     def give_hiring_manager_approval(self, chief_email):
         # Email Hiring manager
         send_email(
@@ -91,31 +138,30 @@ class Requirement(models.Model):
             },
         )
 
-    @transition(field=state, source='chief_approval_required', target='busops_approval_required')
+    @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=BUS_OPS_APPROVAL_REQUIRED)
     def give_chief_approval(self):
         pass
         # Get group to send email to
         #send_email()
 
 
-    @transition(field=state, source='busops_approval_required', target='in_progress')
+    @transition(field=state, source=BUS_OPS_APPROVAL_REQUIRED, target=IN_PROGRESS)
     def give_busops_approval(self):
         pass
 
-
-    @transition(field=state, source='in_progress', target='director_approved')
+    @transition(field=state, source=IN_PROGRESS, target=DIRECTOR_APPROVED)
     def give_director_approval(self):
         pass
 
-    @transition(field=state, source='director_approved', target='dg_coo_approved')
+    @transition(field=state, source=DIRECTOR_APPROVED, target=DG_COO_APPROVED)
     def give_dg_coo_approval(self):
         pass
 
-    @transition(field=state, source='dg_coo_approved', target='complete')
+    @transition(field=state, source=DG_COO_APPROVED, target=COMPLETE)
     def hiring_manager_approval(self):
         pass
 
-    @transition(field=state, source='dg_coo_approved', target='reconsider')
+    @transition(field=state, source=DG_COO_APPROVED, target='reconsider')
     def hiring_manager_rejection(self):
         pass
 

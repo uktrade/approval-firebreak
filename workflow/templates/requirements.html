@@ -2,19 +2,52 @@
 
 {% block main_content %}
     <h1 class="govuk-heading-m">Current requirements</h1>
-    <ul>
+    <ul class="govuk-list">
         {% for requirement in object_list %}
             <li>
-                <div>
-                    <p>ID: {{ requirement.pk }}</p>
-                    <p>Submitted by: {{ requirement.submitter.first_name }} {{ requirement.submitter.last_name }}</p>
-                    <p>Submitted on: {{ requirement.submitted_on }}</p>
-                    <p>Current state: {{ requirement.state }}</p>
-                    <p><a href="{% url "approval" requirement_id=requirement.uuid %}">View requirement</a></p>
-                </div>
+
+                    <dl class="govuk-summary-list">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                ID
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                {{ requirement.pk }}
+                            </dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Submitted by
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                {{ requirement.submitter.first_name }} {{ requirement.submitter.last_name }}
+                            </dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Submitted on
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                {{ requirement.submitted_on }}
+                            </dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Current state
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                {{ requirement.nice_name }}
+                            </dd>
+                        </div>
+                    </dl>
+                    <p>
+                        <a class="govuk-button" data-module="govuk-button" href="{% url "approval" requirement_id=requirement.uuid %}">View requirement</a>
+                    </p>
+
             </li>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
         {% empty %}
-            <li>No requirements yet.</li>
+            <li><p class="govuk-body">No requirements yet.</p></li>
         {% endfor %}
     </ul>
 {% endblock %}
