@@ -4,6 +4,7 @@
 *.swp
 *.retry
 .env
+venv
 *~
 /logs
 /data
