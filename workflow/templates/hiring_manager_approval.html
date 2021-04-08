@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+    <h1 class="govuk-heading-l">Hiring manager - DDaT Contingent worker requirement approval</h1>
+    <h2 class="govuk-heading-m">Requirement details</h2>
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Submitted by
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ requirement.submitter.first_name }} {{ requirement.submitter.last_name }}
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Submitted on
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ requirement.submitted_on }}
+            </dd>
+        </div>
+    </dl>
+
+    <form action="" method="post" novalidate>
+        {% csrf_token %}
+        {% include "includes/govt_uk_form.html" with form=form %}
+        <input class="govuk-button" data-module="govuk-button" type="submit" value="Approve">
+    </form>
+
+
+    <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Request changes
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            <form action="" method="post" novalidate>
+                {% csrf_token %}
+                {% include "includes/govt_uk_form.html" with form=request_changes_form %}
+                <input class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" value="Request changes">
+            </form>
+        </div>
+    </details>
+    <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Reject this requirement
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            <form action="" method="post" novalidate>
+                {% csrf_token %}
+                {% include "includes/govt_uk_form.html" with form=reject_form %}
+                <input class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit" value="Reject">
+            </form>
+        </div>
+    </details>
+{% endblock %}

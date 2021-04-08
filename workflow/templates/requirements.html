@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+    <h1 class="govuk-heading-m">Current requirements</h1>
+    <ul>
+        {% for requirement in object_list %}
+            <li>
+                <div>
+                    <p>ID: {{ requirement.pk }}</p>
+                    <p>Submitted by: {{ requirement.submitter.first_name }} {{ requirement.submitter.last_name }}</p>
+                    <p>Submitted on: {{ requirement.submitted_on }}</p>
+                    <p>Current state: {{ requirement.state }}</p>
+                    <p><a href="{% url "approval" requirement_id=requirement.uuid %}">View requirement</a></p>
+                </div>
+            </li>
+        {% empty %}
+            <li>No requirements yet.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

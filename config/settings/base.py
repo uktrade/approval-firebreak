@@ -60,6 +60,7 @@ DJANGO_APPS = [
 ]
 
 LOCAL_APPS = [
+    "core",
     "user",
     "workflow",
 ]
@@ -67,6 +68,7 @@ LOCAL_APPS = [
 THIRD_PARTY_APPS = [
     "authbroker_client",
     "simple_history",
+    "webpack_loader",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -162,6 +164,7 @@ STATICFILES_DIRS = (
 )
 
 AUTHENTICATION_BACKENDS = [
+    #'django.contrib.auth.backends.ModelBackend',
     "user.backends.CustomAuthbrokerBackend",
 ]
 
@@ -180,3 +183,9 @@ SETTINGS_EXPORT = [
     "GTM_CODE",
     "GTM_AUTH",
 ]
+
+# Notify
+GOVUK_NOTIFY_API_KEY = env("GOVUK_NOTIFY_API_KEY")
+# Notify templates
+HIRING_MANAGER_NEW_REQUEST_TEMPLATE_ID = env("HIRING_MANAGER_NEW_REQUEST_TEMPLATE_ID")
+CHIEF_APPROVAL_REQUEST_TEMPLATE_ID = env("CHIEF_APPROVAL_REQUEST_TEMPLATE_ID")

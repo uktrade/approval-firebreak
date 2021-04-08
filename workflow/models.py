@@ -1,7 +1,9 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 
 from django_fsm import FSMField, transition
 
@@ -78,11 +80,28 @@ class Requirement(models.Model):
 
         return False
 
-    @transition(field=state, source='submitted', target='in_progress')
+    @transition(field=state, source='submitted', target='chief_approval_required')
+    def give_hiring_manager_approval(self, chief_email):
+        # Email Hiring manager
+        send_email(
+            to=chief_email,
+            template_id=settings.CHIEF_APPROVAL_REQUEST_TEMPLATE_ID,
+            personalisation={
+                "requirement_link": reverse("approval", kwargs={'requirement_id': self.uuid}),
+            },
+        )
+
+    @transition(field=state, source='chief_approval_required', target='busops_approval_required')
     def give_chief_approval(self):
         pass
         # Get group to send email to
         #send_email()
+
+
+    @transition(field=state, source='busops_approval_required', target='in_progress')
+    def give_busops_approval(self):
+        pass
+
 
     @transition(field=state, source='in_progress', target='director_approved')
     def give_director_approval(self):
@@ -103,6 +122,7 @@ class Requirement(models.Model):
 
 class RequirementSubmitStep(models.Model):
     name_of_hiring_manager = models.CharField(max_length=255)
+    email_of_hiring_manager = models.EmailField()
     requirement = models.ForeignKey(
         Requirement,
         on_delete=models.CASCADE,
@@ -111,8 +131,10 @@ class RequirementSubmitStep(models.Model):
     )
 
 
-class RequirementFinanceStep(models.Model):
+class HiringManagerApprovalStep(models.Model):
     cost_centre_code = models.CharField(max_length=255)
+    name_of_chief = models.CharField(max_length=255)
+    email_of_chief = models.EmailField()
     requirement = models.ForeignKey(
         Requirement,
         on_delete=models.CASCADE,
@@ -141,11 +163,3 @@ class RequirementCommercialStep(models.Model):
     )
 
 
-class RequirementHiringManagerStep(models.Model):
-    professional_services_team = models.CharField(max_length=255)
-    requirement = models.ForeignKey(
-        Requirement,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
