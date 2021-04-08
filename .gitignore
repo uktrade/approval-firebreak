@@ -14,6 +14,7 @@ __pycache__
 !.gitignore
 .venv/
 .pytest_cache/
+venv/
 
 /node_modules
 npm-debug.log*
