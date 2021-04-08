@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+    <h1 class="govuk-heading-m">New DDaT Contingent worker requirement</h1>
+    <form action="" method="post" novalidate>
+        {% csrf_token %}
+        {% include "includes/govt_uk_form.html" with form=form %}
+        <input class="govuk-button" data-module="govuk-button" type="submit" value="Submit">
+    </form>
+{% endblock %}

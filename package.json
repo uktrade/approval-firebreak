@@ -1,8 +1,21 @@
 {
   "devDependencies": {
-    "webpack-bundle-tracker": "^1.0.0-alpha.1"
+    "webpack": "^5.31.0",
+    "webpack-bundle-tracker": "^0.4.3",
+    "webpack-cli": "^4.6.0"
   },
   "dependencies": {
-    "govuk-frontend": "^3.11.0"
+    "css-loader": "^5.2.0",
+    "file-loader": "^6.2.0",
+    "govuk-frontend": "^3.11.0",
+    "mini-css-extract-plugin": "^1.4.1",
+    "sass": "^1.32.8",
+    "sass-loader": "^11.0.1"
+  },
+  "scripts": {
+    "dev": "webpack --config webpack.config.js --watch --mode=development",
+    "build": "webpack --config webpack.config.js",
+    "heroku-postbuild": "npm run build",
+    "clean": "rm -f ./assets/webpack_bundles/*"
   }
 }
