@@ -3,8 +3,6 @@ from django.forms.widgets import Textarea, Select, CheckboxInput,TextInput, Date
 
 from workflow.models import (
     Requirement,
-    RequirementSubmitStep,
-    HiringManagerApprovalStep,
 )
 
 class GovFormattedModelForm(forms.ModelForm):
@@ -20,15 +18,6 @@ class GovFormattedModelForm(forms.ModelForm):
                 widget.attrs.update({'class': 'govuk-checkboxes'})
             elif isinstance(widget, TextInput):
                 widget.attrs.update({'class': 'govuk-input'})
-
-
-class RejectForm(forms.Form):
-    details = forms.CharField(
-        widget=forms.Textarea(attrs={
-            "rows": 5, "cols": 20,
-            "class": "govuk-textarea",
-        })
-    )
 
 
 class RequestChangesForm(forms.Form):
@@ -54,7 +43,7 @@ class ChiefApprovalForm(ApprovalForm):
 
 class BusOpsApprovalForm(ApprovalForm):
     def save(self, requirement):
-        requirement.give_chief_approval()
+        requirement.give_busops_approval()
         requirement.save()
 
 
@@ -70,14 +59,49 @@ class DHCOOApprovalForm(ApprovalForm):
         requirement.save()
 
 
+# class RequirementSubmitStepForm(forms.ModelForm):
+#     class Meta:
+#         model = RequirementSubmitStep
+#         fields = [
+#             "project_name_title_of_role",
+#             "name_of_hiring_manager",
+#             "email_of_hiring_manager",
+#         ]
+#         labels = {
+#             "project_name_title_of_role": "Project name/title of role"
+#         }
+#
+#     def __init__(self, *args, **kwargs):
+#         self.submitter = kwargs.pop("submitter", None)
+#         super(RequirementSubmitStepForm, self).__init__(*args, **kwargs)
+#         self.fields['name_of_hiring_manager'].widget.attrs.update({'class': 'govuk-input'})
+#         self.fields['email_of_hiring_manager'].widget.attrs.update({'class': 'govuk-input'})
+#         self.fields['project_name_title_of_role'].widget.attrs.update({'class': 'govuk-input'})
+#
+#     def save(self, commit=True):
+#         # Create a new requirement
+#         instance = super(
+#             RequirementSubmitStepForm,
+#             self,
+#         ).save(commit=False)
+#         instance.requirement = Requirement.objects.create(
+#             submitter=self.submitter,
+#         )
+#         instance.save()
+#
+#         return instance
 
-class RequirementSubmitStepForm(GovFormattedModelForm):
+
+class NewRequirementForm(GovFormattedModelForm):
     class Meta:
-        model = RequirementSubmitStep
+        model = Requirement
         fields = [
             "project_name_role_title",
             "IR35",
             "directorate",
+            "cost_centre_code",
+            "name_of_chief",
+            "email_of_chief",
             "name_of_hiring_manager",
             "email_of_hiring_manager",
             "authorising_director",
@@ -98,51 +122,18 @@ class RequirementSubmitStepForm(GovFormattedModelForm):
         ]
         # exclude = ['requirement']
 
+
     def __init__(self, *args, **kwargs):
-        self.submitter = kwargs.pop("submitter", None)
-        super(RequirementSubmitStepForm, self).__init__(*args, **kwargs)
+        self.hiring_manager = kwargs.pop("hiring_manager", None)
+        super(NewRequirementForm, self).__init__(*args, **kwargs)
 
     def save(self, commit=True):
         # Create a new requirement
         instance = super(
-            RequirementSubmitStepForm,
+            NewRequirementForm,
             self,
         ).save(commit=False)
-        instance.requirement = Requirement.objects.create(
-            submitter=self.submitter,
-        )
-        instance.save()
-
-        return instance
-
-
-class HiringManagerApprovalStepForm(forms.ModelForm):
-    class Meta:
-        model = HiringManagerApprovalStep
-        fields = [
-            "cost_centre_code",
-            "name_of_chief",
-            "email_of_chief",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        self.requirement = kwargs.pop("requirement", None)
-        super(HiringManagerApprovalStepForm, self).__init__(*args, **kwargs)
-        self.fields['cost_centre_code'].widget.attrs.update({'class': 'govuk-input'})
-        self.fields['name_of_chief'].widget.attrs.update({'class': 'govuk-input'})
-        self.fields['email_of_chief'].widget.attrs.update({'class': 'govuk-input'})
-
-    def save(self, commit=True):
-        # Create a new requirement
-        instance = super(
-            HiringManagerApprovalStepForm,
-            self,
-        ).save(commit=False)
-        instance.requirement = self.requirement
-        instance.requirement.give_hiring_manager_approval(
-            chief_email=instance.email_of_chief,
-        )
-        instance.requirement.save()
+        instance.hiring_manager = self.hiring_manager
         instance.save()
 
         return instance

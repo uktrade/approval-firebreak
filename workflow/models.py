@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from django_fsm import FSMField, transition
 
+from chartofaccount.models import Directorate
 from core.notify import send_email
 
 
@@ -84,89 +85,14 @@ class Requirement(models.Model):
         default=uuid.uuid4,
         editable=False
     )
-    submitter = models.ForeignKey(
+    hiring_manager = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
     )
     submitted_on = models.DateTimeField(
         auto_now_add=True,
     )
-    state = FSMField(
-        default='submitted',
-    )
-    finance_approval = models.ForeignKey(
-        Approval,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="finance_approvals",
-    )
-    hr_approval = models.ForeignKey(
-        Approval,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="hr_approvals",
-    )
-    commercial_approval = models.ForeignKey(
-        Approval,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="commercial_approvals",
-    )
 
-    @property
-    def nice_name(self):
-        return REQUIREMENT_STATES[self.state]["nice_name"]
-
-    @property
-    def has_departmental_approval(self):
-        if self.finance_approval and self.hr_approval and self.commercial_approval:
-            return True
-
-        return False
-
-    @transition(field=state, source=SUBMITTED, target=CHIEF_APPROVAL_REQUIRED)
-    def give_hiring_manager_approval(self, chief_email):
-        # Email Hiring manager
-        send_email(
-            to=chief_email,
-            template_id=settings.CHIEF_APPROVAL_REQUEST_TEMPLATE_ID,
-            personalisation={
-                "requirement_link": reverse("approval", kwargs={'requirement_id': self.uuid}),
-            },
-        )
-
-    @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=BUS_OPS_APPROVAL_REQUIRED)
-    def give_chief_approval(self):
-        pass
-        # Get group to send email to
-        #send_email()
-
-
-    @transition(field=state, source=BUS_OPS_APPROVAL_REQUIRED, target=IN_PROGRESS)
-    def give_busops_approval(self):
-        pass
-
-    @transition(field=state, source=IN_PROGRESS, target=DIRECTOR_APPROVED)
-    def give_director_approval(self):
-        pass
-
-    @transition(field=state, source=DIRECTOR_APPROVED, target=DG_COO_APPROVED)
-    def give_dg_coo_approval(self):
-        pass
-
-    @transition(field=state, source=DG_COO_APPROVED, target=COMPLETE)
-    def hiring_manager_approval(self):
-        pass
-
-    @transition(field=state, source=DG_COO_APPROVED, target='reconsider')
-    def hiring_manager_rejection(self):
-        pass
-
-
-class RequirementSubmitStep(models.Model):
     CONTRACTOR_TYPE_GENERALIST = 'generalist'
     CONTRACTOR_TYPE_SPECIALIST = 'specialist'
     CONTRACTOR_TYPE_CHOICES = [
@@ -210,50 +136,87 @@ class RequirementSubmitStep(models.Model):
     job_description_submitted = models.BooleanField(default=False)
 
     directorate = models.ForeignKey(
-        Requirement,
+        Directorate,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="directorates",
     )
-    requirement = models.ForeignKey(
-        Requirement,
+
+    state = FSMField(
+        default='submitted',
+    )
+    finance_approval = models.ForeignKey(
+        Approval,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="requirements",
+        related_name="finance_approvals",
     )
-
-
-class HiringManagerApprovalStep(models.Model):
+    hr_approval = models.ForeignKey(
+        Approval,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="hr_approvals",
+    )
+    commercial_approval = models.ForeignKey(
+        Approval,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="commercial_approvals",
+    )
+    project_name_title_of_role = models.CharField(max_length=255)
     cost_centre_code = models.CharField(max_length=255)
     name_of_chief = models.CharField(max_length=255)
     email_of_chief = models.EmailField()
-    requirement = models.ForeignKey(
-        Requirement,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-
-
-class RequirementHRStep(models.Model):
     slot_codes = models.CharField(max_length=255)
-    requirement = models.ForeignKey(
-        Requirement,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
 
+    @property
+    def nice_name(self):
+        return REQUIREMENT_STATES[self.state]["nice_name"]
 
-class RequirementCommercialStep(models.Model):
-    professional_services_team = models.CharField(max_length=255)
-    requirement = models.ForeignKey(
-        Requirement,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
+    @property
+    def has_departmental_approval(self):
+        if self.finance_approval and self.hr_approval and self.commercial_approval:
+            return True
 
+        return False
 
+    @transition(field=state, source=SUBMITTED, target=CHIEF_APPROVAL_REQUIRED)
+    def give_hiring_manager_approval(self, chief_email):
+        # Email Hiring manager
+        send_email(
+            to=chief_email,
+            template_id=settings.CHIEF_APPROVAL_REQUEST_TEMPLATE_ID,
+            personalisation={
+                "requirement_link": reverse("approval", kwargs={'requirement_id': self.uuid}),
+            },
+        )
+
+    @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=BUS_OPS_APPROVAL_REQUIRED)
+    def give_chief_approval(self):
+        pass
+        # Get group to send email to
+        #send_email()
+
+    @transition(field=state, source=BUS_OPS_APPROVAL_REQUIRED, target=IN_PROGRESS)
+    def give_busops_approval(self):
+        pass
+
+    @transition(field=state, source=IN_PROGRESS, target=DIRECTOR_APPROVED)
+    def give_director_approval(self):
+        pass
+
+    @transition(field=state, source=DIRECTOR_APPROVED, target=DG_COO_APPROVED)
+    def give_dg_coo_approval(self):
+        pass
+
+    @transition(field=state, source=DG_COO_APPROVED, target=COMPLETE)
+    def hiring_manager_approval(self):
+        pass
+
+    @transition(field=state, source=DG_COO_APPROVED, target='reconsider')
+    def hiring_manager_rejection(self):
+        pass
