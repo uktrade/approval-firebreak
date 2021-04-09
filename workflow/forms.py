@@ -1,10 +1,12 @@
 from django import forms
+from django.forms.widgets import Textarea, Select, CheckboxInput,TextInput, DateInput
 
 from workflow.models import (
     Requirement,
     RequirementSubmitStep,
     HiringManagerApprovalStep,
 )
+
 
 
 class RejectForm(forms.Form):
@@ -55,6 +57,7 @@ class DHCOOApprovalForm(ApprovalForm):
         requirement.save()
 
 
+
 class RequirementSubmitStepForm(forms.ModelForm):
     class Meta:
         model = RequirementSubmitStep
@@ -85,8 +88,16 @@ class RequirementSubmitStepForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.submitter = kwargs.pop("submitter", None)
         super(RequirementSubmitStepForm, self).__init__(*args, **kwargs)
-        self.fields['name_of_hiring_manager'].widget.attrs.update({'class': 'govuk-input'})
-        self.fields['email_of_hiring_manager'].widget.attrs.update({'class': 'govuk-input'})
+        for field in self.fields.items():
+            widget = field[1].widget
+            if isinstance(widget, Textarea):
+                widget.attrs.update({'class': 'govuk-textarea'})
+            elif isinstance(widget, Select):
+                widget.attrs.update({'class': 'govuk-select'})
+            elif isinstance(widget, CheckboxInput):
+                widget.attrs.update({'class': 'govuk-checkboxes'})
+            elif isinstance(widget, TextInput):
+                widget.attrs.update({'class': 'govuk-input'})
 
     def save(self, commit=True):
         # Create a new requirement
