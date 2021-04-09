@@ -167,11 +167,21 @@ class Requirement(models.Model):
 
 
 class RequirementSubmitStep(models.Model):
-    GENERALIST = 'generalist'
-    SPECIALIST = 'specialist'
+    CONTRACTOR_TYPE_GENERALIST = 'generalist'
+    CONTRACTOR_TYPE_SPECIALIST = 'specialist'
     CONTRACTOR_TYPE_CHOICES = [
-        (GENERALIST, 'generalist'),
-        (SPECIALIST, 'specialist'),
+        (CONTRACTOR_TYPE_GENERALIST, 'generalist'),
+        (CONTRACTOR_TYPE_SPECIALIST, 'specialist'),
+    ]
+    SECURITY_CLEARANCE_BPSS = "BPSS"
+    SECURITY_CLEARANCE_SC = "sc"
+    SECURITY_CLEARANCE_DV = "dv"
+    SECURITY_CLEARANCE_CTC = "ctc"
+    SECURITY_CLEARANCE_CHOICES = [
+        (SECURITY_CLEARANCE_BPSS , "BPSS"),
+        (SECURITY_CLEARANCE_SC , "sc"),
+        (SECURITY_CLEARANCE_DV , "dv"),
+        (SECURITY_CLEARANCE_CTC , "ctc"),
     ]
 
     name_of_hiring_manager = models.CharField(max_length=255)
@@ -184,25 +194,34 @@ class RequirementSubmitStep(models.Model):
     name_of_contractor = models.CharField(max_length=255, blank=True, null=True)
     uk_based = models.BooleanField(default=True)
     overseas_country = models.CharField(max_length=255, blank=True, null=True)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    type_of_security_clearance = models.DateTimeField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    type_of_security_clearance = models.CharField(
+        max_length=50,
+        choices=SECURITY_CLEARANCE_CHOICES,
+    )
     contractor_type = models.CharField(
         max_length=50,
         choices=CONTRACTOR_TYPE_CHOICES,
     )
+    part_b_business_case = models.TextField(null=True, blank=True)
+    part_b_impact = models.TextField(null=True, blank=True)
+    part_b_main_reason = models.TextField(null=True, blank=True)
+    job_description_submitted = models.BooleanField(default=False)
 
     directorate = models.ForeignKey(
         Requirement,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
+        related_name="directorates",
     )
     requirement = models.ForeignKey(
         Requirement,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
+        related_name="requirements",
     )
 
 

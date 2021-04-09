@@ -59,9 +59,28 @@ class RequirementSubmitStepForm(forms.ModelForm):
     class Meta:
         model = RequirementSubmitStep
         fields = [
+            "project_name_role_title",
+            "IR35",
+            "directorate",
             "name_of_hiring_manager",
             "email_of_hiring_manager",
+            "authorising_director",
+            "email_of_authorising_director",
+            "new_requirement",
+            "name_of_contractor",
+            "uk_based",
+            "overseas_country",
+            "start_date",
+            "end_date",
+            "type_of_security_clearance",
+            "contractor_type",
+            "part_b_business_case",
+            "part_b_impact",
+            "part_b_main_reason",
+            "job_description_submitted",
+            "requirement",
         ]
+        # exclude = ['requirement']
 
     def __init__(self, *args, **kwargs):
         self.submitter = kwargs.pop("submitter", None)
