@@ -7,6 +7,19 @@ from workflow.models import (
     HiringManagerApprovalStep,
 )
 
+class GovFormattedModelForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        for field in self.fields.items():
+            widget = field[1].widget
+            if isinstance(widget, Textarea):
+                widget.attrs.update({'class': 'govuk-textarea'})
+            elif isinstance(widget, Select):
+                widget.attrs.update({'class': 'govuk-select'})
+            elif isinstance(widget, CheckboxInput):
+                widget.attrs.update({'class': 'govuk-checkboxes'})
+            elif isinstance(widget, TextInput):
+                widget.attrs.update({'class': 'govuk-input'})
 
 
 class RejectForm(forms.Form):
@@ -58,7 +71,7 @@ class DHCOOApprovalForm(ApprovalForm):
 
 
 
-class RequirementSubmitStepForm(forms.ModelForm):
+class RequirementSubmitStepForm(GovFormattedModelForm):
     class Meta:
         model = RequirementSubmitStep
         fields = [
@@ -88,16 +101,6 @@ class RequirementSubmitStepForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.submitter = kwargs.pop("submitter", None)
         super(RequirementSubmitStepForm, self).__init__(*args, **kwargs)
-        for field in self.fields.items():
-            widget = field[1].widget
-            if isinstance(widget, Textarea):
-                widget.attrs.update({'class': 'govuk-textarea'})
-            elif isinstance(widget, Select):
-                widget.attrs.update({'class': 'govuk-select'})
-            elif isinstance(widget, CheckboxInput):
-                widget.attrs.update({'class': 'govuk-checkboxes'})
-            elif isinstance(widget, TextInput):
-                widget.attrs.update({'class': 'govuk-input'})
 
     def save(self, commit=True):
         # Create a new requirement
