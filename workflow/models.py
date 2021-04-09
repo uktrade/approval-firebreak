@@ -167,8 +167,37 @@ class Requirement(models.Model):
 
 
 class RequirementSubmitStep(models.Model):
+    GENERALIST = 'generalist'
+    SPECIALIST = 'specialist'
+    CONTRACTOR_TYPE_CHOICES = [
+        (GENERALIST, 'generalist'),
+        (SPECIALIST, 'specialist'),
+    ]
+
     name_of_hiring_manager = models.CharField(max_length=255)
     email_of_hiring_manager = models.EmailField()
+    authorising_director = models.CharField(max_length=255)
+    email_of_authorising_director = models.EmailField()
+    project_name_role_title = models.CharField(max_length=255)
+    IR35 = models.BooleanField(default=False)
+    new_requirement = models.BooleanField(default=True)
+    name_of_contractor = models.CharField(max_length=255, blank=True, null=True)
+    uk_based = models.BooleanField(default=True)
+    overseas_country = models.CharField(max_length=255, blank=True, null=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    type_of_security_clearance = models.DateTimeField()
+    contractor_type = models.CharField(
+        max_length=50,
+        choices=CONTRACTOR_TYPE_CHOICES,
+    )
+
+    directorate = models.ForeignKey(
+        Requirement,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     requirement = models.ForeignKey(
         Requirement,
         on_delete=models.CASCADE,
