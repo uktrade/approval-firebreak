@@ -10,10 +10,8 @@ from core.notify import send_email
 
 from workflow.forms import (
     ChiefApprovalForm,
-    HiringManagerApprovalStepForm,
-    RejectForm,
-    RequirementSubmitStepForm,
     RequestChangesForm,
+    NewRequirementForm,
 )
 from workflow.models import (
     Requirement,
@@ -42,7 +40,7 @@ class RequirementsView(ListView):
 
     def get_queryset(self):
         requirements = Requirement.objects.filter(
-            state=SUBMITTED,
+            #state=SUBMITTED,
             submitter=self.request.user,
         )
 
@@ -78,7 +76,7 @@ class RequirementsView(ListView):
 
 # New requirement
 class NewRequirementView(View):
-    form_class = RequirementSubmitStepForm
+    form_class = NewRequirementForm
     template_name = 'new_requirement.html'
 
     def get(self, request, *args, **kwargs):
@@ -86,13 +84,14 @@ class NewRequirementView(View):
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, submitter=request.user)
+        # TODO - check that user is in hiring manager group
+        form = self.form_class(request.POST, hiring_manager=request.user)
         if form.is_valid():
-            requirement_submit_step = form.save()
+            requirement = form.save()
 
             # Email Hiring manager
             send_email(
-                to=requirement_submit_step.email_of_hiring_manager,
+                to=requirement.hiring_manager.email,
                 template_id=settings.HIRING_MANAGER_NEW_REQUEST_TEMPLATE_ID,
                 personalisation={
                     "submitter_name": request.user.get_full_name(),
@@ -107,7 +106,6 @@ class NewRequirementView(View):
 
 
 class RequirementSubmittedView(View):
-    form_class = RequirementSubmitStepForm
     template_name = 'requirement_submitted.html'
 
     def get(self, request, *args, **kwargs):
@@ -115,14 +113,9 @@ class RequirementSubmittedView(View):
 
 
 def get_form_and_template(requirement, content=None):
-    if requirement.state == "submitted":
+    if requirement.state == CHIEF_APPROVAL_REQUIRED:
         # Needs Chief approval
-        form = HiringManagerApprovalStepForm(content, requirement=requirement)
-        template_name = "hiring_manager_approval.html"
-        success_view = "approved"
-    elif requirement.state == "submitted":
-        # Needs Chief approval
-        form = ChiefApprovalForm(content, requirement=requirement)
+        form = ChiefApprovalForm(content)
         template_name = "chief_approval.html"
         success_view = "approved"
     # elif requirement.state == "in_progress":
@@ -158,7 +151,6 @@ class ApprovalView(View):
             )
 
         request_changes_form = RequestChangesForm()
-        reject_form = RejectForm()
 
         if not requirement:
             raise Http404("Cannot find requirement")
@@ -168,7 +160,6 @@ class ApprovalView(View):
         return render(request, template_name, {
             'form': form,
             "request_changes_form": request_changes_form,
-            "reject_form": reject_form,
             'requirement': requirement,
         })
 

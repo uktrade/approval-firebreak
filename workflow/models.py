@@ -84,7 +84,7 @@ class Requirement(models.Model):
         default=uuid.uuid4,
         editable=False
     )
-    submitter = models.ForeignKey(
+    hiring_manager = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
     )
@@ -115,6 +115,11 @@ class Requirement(models.Model):
         blank=True,
         related_name="commercial_approvals",
     )
+    project_name_title_of_role = models.CharField(max_length=255)
+    cost_centre_code = models.CharField(max_length=255)
+    name_of_chief = models.CharField(max_length=255)
+    email_of_chief = models.EmailField()
+    slot_codes = models.CharField(max_length=255)
 
     @property
     def nice_name(self):
@@ -137,6 +142,8 @@ class Requirement(models.Model):
                 "requirement_link": reverse("approval", kwargs={'requirement_id': self.uuid}),
             },
         )
+
+
 
     @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=BUS_OPS_APPROVAL_REQUIRED)
     def give_chief_approval(self):
@@ -164,48 +171,3 @@ class Requirement(models.Model):
     @transition(field=state, source=DG_COO_APPROVED, target='reconsider')
     def hiring_manager_rejection(self):
         pass
-
-
-class RequirementSubmitStep(models.Model):
-    name_of_hiring_manager = models.CharField(max_length=255)
-    email_of_hiring_manager = models.EmailField()
-    requirement = models.ForeignKey(
-        Requirement,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-
-
-class HiringManagerApprovalStep(models.Model):
-    cost_centre_code = models.CharField(max_length=255)
-    name_of_chief = models.CharField(max_length=255)
-    email_of_chief = models.EmailField()
-    requirement = models.ForeignKey(
-        Requirement,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-
-
-class RequirementHRStep(models.Model):
-    slot_codes = models.CharField(max_length=255)
-    requirement = models.ForeignKey(
-        Requirement,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-
-
-class RequirementCommercialStep(models.Model):
-    professional_services_team = models.CharField(max_length=255)
-    requirement = models.ForeignKey(
-        Requirement,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-
-

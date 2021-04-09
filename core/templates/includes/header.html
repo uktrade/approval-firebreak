@@ -23,12 +23,12 @@
             </button>
             <nav>
                 <ul id="navigation" class="govuk-header__navigation " aria-label="Navigation menu">
-                    <li class="govuk-header__navigation-item govuk-header__navigation-item--active">
+                    <li class="govuk-header__navigation-item {% if request.path == "/new-requirement/" %}govuk-header__navigation-item--active{% endif %}">
                         <a class="govuk-header__link" href="{% url "new_requirement" %}">
                             New requirement
                         </a>
                     </li>
-                    <li class="govuk-header__navigation-item">
+                    <li class="govuk-header__navigation-item {% if request.path in "/" %}govuk-header__navigation-item--active{% endif %}">
                         <a class="govuk-header__link" href="{% url "requirements" %}">
                             My requirements
                         </a>

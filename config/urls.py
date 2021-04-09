@@ -9,5 +9,5 @@ from workflow import urls as workflow_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("auth/", include(authbroker_client_urls)),
-    path("workflow/", include(workflow_urls)),
+    path("", include(workflow_urls)),
 ]
