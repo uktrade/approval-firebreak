@@ -1,4 +1,4 @@
-from django_log_formatter_ecs import ECSFormatter
+# from django_log_formatter_ecs import ECSFormatter
 
 from .base import *  # noqa
 
@@ -10,13 +10,13 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_HSTS_SECONDS = 15768000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
-INSTALLED_APPS += [  # noqa F405
-    "elasticapm.contrib.django",
-]
+# INSTALLED_APPS += [  # noqa F405
+#     "elasticapm.contrib.django",
+# ]
 
 ELASTIC_APM = {
     "SERVICE_NAME": "Digital Workspace",
@@ -31,7 +31,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "ecs_formatter": {
-            "()": ECSFormatter,
+            # "()": ECSFormatter,
         },
         "simple": {
             "format": "{asctime} {levelname} {message}",

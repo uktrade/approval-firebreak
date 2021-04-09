@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('workflow', '0004_auto_20210408_1341'),
+        ('workflow', '0002_rename_submitter_requirement_hiring_manager'),
     ]
 
     operations = [

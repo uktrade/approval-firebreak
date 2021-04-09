@@ -102,8 +102,8 @@ class NewRequirementForm(GovFormattedModelForm):
             "cost_centre_code",
             "name_of_chief",
             "email_of_chief",
-            "name_of_hiring_manager",
-            "email_of_hiring_manager",
+            # "name_of_hiring_manager",
+            # "email_of_hiring_manager",
             "authorising_director",
             "email_of_authorising_director",
             "new_requirement",
@@ -118,9 +118,7 @@ class NewRequirementForm(GovFormattedModelForm):
             "part_b_impact",
             "part_b_main_reason",
             "job_description_submitted",
-            "requirement",
         ]
-        # exclude = ['requirement']
 
 
     def __init__(self, *args, **kwargs):

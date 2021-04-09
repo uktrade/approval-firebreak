@@ -80,19 +80,6 @@ REQUIREMENT_STATES = {
 
 
 class Requirement(models.Model):
-    uuid = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
-    hiring_manager = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-    )
-    submitted_on = models.DateTimeField(
-        auto_now_add=True,
-    )
-
     CONTRACTOR_TYPE_GENERALIST = 'generalist'
     CONTRACTOR_TYPE_SPECIALIST = 'specialist'
     CONTRACTOR_TYPE_CHOICES = [
@@ -109,30 +96,78 @@ class Requirement(models.Model):
         (SECURITY_CLEARANCE_DV , "dv"),
         (SECURITY_CLEARANCE_CTC , "ctc"),
     ]
+    IR35_IN = 'in'
+    IR35_OUT = 'out'
+    IR35_CHOICES = [
+        (IR35_IN, 'IN'),
+        (IR35_OUT, 'OUT'),
+    ]
 
-    name_of_hiring_manager = models.CharField(max_length=255)
-    email_of_hiring_manager = models.EmailField()
-    authorising_director = models.CharField(max_length=255)
-    email_of_authorising_director = models.EmailField()
-    project_name_role_title = models.CharField(max_length=255)
-    IR35 = models.BooleanField(default=False)
-    new_requirement = models.BooleanField(default=True)
-    name_of_contractor = models.CharField(max_length=255, blank=True, null=True)
+    uuid = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    hiring_manager = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+    )
+    submitted_on = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    authorising_director = models.CharField(verbose_name="Authorising Director", max_length=255)
+    email_of_authorising_director = models.EmailField(verbose_name="Authorising Director Email")
+    project_name_role_title = models.CharField(
+        max_length=255,
+        verbose_name="Project name/ Title of the Role"
+    )
+    IR35 = models.CharField(
+        max_length=50,
+        choices=IR35_CHOICES,
+        verbose_name="IN / OUT of Scope of IR35"
+    )
+    new_requirement = models.BooleanField(default=True, verbose_name="New")
+    name_of_contractor = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="If Nominated Worker - please provide Name of the contractor"
+    )
     uk_based = models.BooleanField(default=True)
-    overseas_country = models.CharField(max_length=255, blank=True, null=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    overseas_country = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name = "if Overseas which Country"
+    )
+    start_date = models.DateField(verbose_name="Anticipated Start Date")
+    end_date = models.DateField(verbose_name="Anticipated End Date")
     type_of_security_clearance = models.CharField(
         max_length=50,
         choices=SECURITY_CLEARANCE_CHOICES,
+        verbose_name="Level of Security clearance required"
     )
     contractor_type = models.CharField(
         max_length=50,
         choices=CONTRACTOR_TYPE_CHOICES,
+        verbose_name="Category of Interim"
     )
-    part_b_business_case = models.TextField(null=True, blank=True)
-    part_b_impact = models.TextField(null=True, blank=True)
-    part_b_main_reason = models.TextField(null=True, blank=True)
+    part_b_business_case = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name="Business Case: Please detail why the interim resource is required."
+    )
+    part_b_impact = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name="What would be the impact of not filling this requirement."
+    )
+    part_b_main_reason = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name="What are the main reasons why this role has not been filled by a substantive Civil Servant. Please detail the strategic workforce plan for this role after the assignment end date:"
+    )
     job_description_submitted = models.BooleanField(default=False)
 
     directorate = models.ForeignKey(
