@@ -1,8 +1,23 @@
 from django import forms
+from django.forms.widgets import Textarea, Select, CheckboxInput,TextInput, DateInput, EmailInput
 
 from workflow.models import (
     Requirement,
 )
+
+class GovFormattedModelForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        for field in self.fields.items():
+            widget = field[1].widget
+            if isinstance(widget, Textarea):
+                widget.attrs.update({'class': 'govuk-textarea'})
+            elif isinstance(widget, Select):
+                widget.attrs.update({'class': 'govuk-select'})
+            elif isinstance(widget, CheckboxInput):
+                widget.attrs.update({'class': 'govuk-checkboxes'})
+            elif isinstance(widget, TextInput) or isinstance(widget,EmailInput):
+                widget.attrs.update({'class': 'govuk-input'})
 
 
 class RequestChangesForm(forms.Form):
@@ -77,21 +92,39 @@ class DHCOOApprovalForm(ApprovalForm):
 #         return instance
 
 
-class NewRequirementForm(forms.ModelForm):
+class NewRequirementForm(GovFormattedModelForm):
     class Meta:
         model = Requirement
         fields = [
+            "project_name_role_title",
+            "group",
+            "directorate",
             "cost_centre_code",
+            "authorising_director",
+            "email_of_authorising_director",
             "name_of_chief",
             "email_of_chief",
+            # "name_of_hiring_manager",
+            # "email_of_hiring_manager",
+            "IR35",
+            "new_requirement",
+            "name_of_contractor",
+            "contractor_type",
+            "uk_based",
+            "overseas_country",
+            "start_date",
+            "end_date",
+            "type_of_security_clearance",
+            "part_b_business_case",
+            "part_b_impact",
+            "part_b_main_reason",
+            "job_description_submitted",
         ]
+
 
     def __init__(self, *args, **kwargs):
         self.hiring_manager = kwargs.pop("hiring_manager", None)
         super(NewRequirementForm, self).__init__(*args, **kwargs)
-        self.fields['cost_centre_code'].widget.attrs.update({'class': 'govuk-input'})
-        self.fields['name_of_chief'].widget.attrs.update({'class': 'govuk-input'})
-        self.fields['email_of_chief'].widget.attrs.update({'class': 'govuk-input'})
 
     def save(self, commit=True):
         # Create a new requirement

@@ -63,6 +63,7 @@ LOCAL_APPS = [
     "core",
     "user",
     "workflow",
+    "chartofaccount"
 ]
 
 THIRD_PARTY_APPS = [
