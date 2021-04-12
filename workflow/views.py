@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import render
@@ -5,7 +6,6 @@ from django.urls import reverse
 from django.views import View
 from django.views.generic.list import ListView
 from django.conf import settings
-
 from core.notify import send_email
 
 from workflow.forms import (
@@ -237,11 +237,25 @@ class ApprovedView(View):
         return render(request, self.template_name)
 
 
-class UsersView(View):
+class UsersView(ListView):
     template_name = 'users.html'
+    model=Group
 
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+    def get_queryset(self):
+        user_list = []
+        groups = Group.objects.all()
+        for group in groups:
+            users = group.user_set.all()
+            for user in users:
+                dict = {
+                            "group": group.name,
+                            "username": f"{user.first_name} {user.last_name}"
+                        }
+                user_list.append(dict)
+        return user_list
+
+    # def get(self, request, *args, **kwargs):
+    #     return render(request, self.template_name)
 
 
 class ProcessOwnerView(View):
@@ -256,6 +270,7 @@ class RequestSubmittedView(View):
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
+
 
 
 # Request changes
