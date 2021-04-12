@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+    <h1 class="govuk-heading-m">System users</h1>
+    <ul class="govuk-list">
+{#        {% for requirement in object_list %}#}
+{#            <li>#}
+{#                {% include "includes/requirement.html" with requirement=requirement %}#}
+{#                <p>#}
+{#                    <a class="govuk-button" data-module="govuk-button" href="{% url "approval" requirement_id=requirement.uuid %}">View requirement</a>#}
+{#                </p>#}
+{#            </li>#}
+{#            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">#}
+{#        {% empty %}#}
+{#            <li><p class="govuk-body">No requirements yet.</p></li>#}
+{#        {% endfor %}#}
+    </ul>
+{% endblock %}

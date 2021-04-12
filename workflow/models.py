@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.db import models
 from django.urls import reverse
 
@@ -15,7 +16,7 @@ from chartofaccount.models import (
 
 from core.notify import send_email
 
-from workflow.custom_fields import YesNoField
+
 User = get_user_model()
 
 
@@ -40,8 +41,10 @@ class Approval(models.Model):
         choices=APPROVAL_CHOICES,
     )
 
-SUBMITTED = "submitted"
+
 CHIEF_APPROVAL_REQUIRED = "chief_approval_required"
+CHIEF_REQUESTS_CHANGES = "chief_requests_changes"
+
 BUS_OPS_APPROVAL_REQUIRED = "bus_ops_approval_required"
 IN_PROGRESS = "in_progress"
 DIRECTOR_APPROVED = "director_approved"
@@ -49,12 +52,12 @@ DG_COO_APPROVED = "dg_coo_approved"
 COMPLETE = "complete"
 
 REQUIREMENT_STATES = {
-    SUBMITTED: {
-        "nice_name": "Submitted",
-        "permissions": ["can_give_hiring_manager_approval", ]
-    },
     CHIEF_APPROVAL_REQUIRED: {
         "nice_name": "Chief approval required",
+        "permissions": ["can_give_chief_approval", ]
+    },
+    CHIEF_REQUESTS_CHANGES: {
+        "nice_name": "A chief has requested changes",
         "permissions": ["can_give_chief_approval", ]
     },
     BUS_OPS_APPROVAL_REQUIRED: {
@@ -82,6 +85,37 @@ REQUIREMENT_STATES = {
         ]
     },
 }
+
+
+class AuditLog(models.Model):
+    action_at = models.DateTimeField(auto_now_add=True)
+    message = models.CharField(max_length=255)
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+    )
+    requirement = models.ForeignKey(
+        "Requirement",
+        on_delete=models.CASCADE,
+    )
+
+
+class Comment(models.Model):
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    message = models.CharField(max_length=255)
+    parent = models.ForeignKey(
+        "Comment",
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+    )
+    requirement = models.ForeignKey(
+        "Requirement",
+        on_delete=models.CASCADE,
+    )
 
 
 class Requirement(models.Model):
@@ -120,9 +154,6 @@ class Requirement(models.Model):
     submitted_on = models.DateTimeField(
         auto_now_add=True,
     )
-
-    authorising_director = models.CharField(verbose_name="Authorising Director", max_length=255)
-    email_of_authorising_director = models.EmailField(verbose_name="Authorising Director Email")
     project_name_role_title = models.CharField(
         max_length=255,
         verbose_name="Project name/ Title of the Role"
@@ -132,7 +163,7 @@ class Requirement(models.Model):
         choices=IR35_CHOICES,
         verbose_name="IN / OUT of Scope of IR35"
     )
-    new_requirement = YesNoField(verbose_name="New")
+    new_requirement = models.BooleanField(verbose_name="New")
     name_of_contractor = models.CharField(
         max_length=255,
         blank=True,
@@ -144,7 +175,7 @@ class Requirement(models.Model):
         max_length=255,
         blank=True,
         null=True,
-        verbose_name = "if Overseas which Country"
+        verbose_name="if Overseas which Country"
     )
     start_date = models.DateField(verbose_name="Anticipated Start Date")
     end_date = models.DateField(verbose_name="Anticipated End Date")
@@ -167,7 +198,7 @@ class Requirement(models.Model):
     part_b_main_reason = models.TextField(
         verbose_name="What are the main reasons why this role has not been filled by a substantive Civil Servant. Please detail the strategic workforce plan for this role after the assignment end date:"
     )
-    job_description_submitted = YesNoField(default=False)
+    job_description_submitted = models.BooleanField(default=False)
 
     directorate = models.ForeignKey(
         Directorate,
@@ -176,7 +207,7 @@ class Requirement(models.Model):
     )
 
     state = FSMField(
-        default='submitted',
+        default=CHIEF_APPROVAL_REQUIRED,
     )
     finance_approval = models.ForeignKey(
         Approval,
@@ -199,7 +230,6 @@ class Requirement(models.Model):
         blank=True,
         related_name="commercial_approvals",
     )
-    project_name_title_of_role = models.CharField(max_length=255)
     group = models.ForeignKey(
         DepartmentalGroup,
         on_delete=models.CASCADE,
@@ -212,9 +242,39 @@ class Requirement(models.Model):
         verbose_name="Cost Centre/Team"
     )
 
-    name_of_chief = models.CharField(max_length=255)
-    email_of_chief = models.EmailField()
     slot_codes = models.CharField(max_length=255)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Email chief
+        chiefs_group = Group.objects.filter(
+            name="Chiefs",
+        ).first()
+
+        chiefs = User.objects.filter(
+            groups=chiefs_group,
+        )
+
+        for chief in chiefs:
+            send_email(
+                subject="A new hiring requirement has been submitted for approval",
+                message=f"Please approve a new hiring requirement at http://localhost:8000/approval/{self.uuid}/",
+                to=chief.email,
+                template_id=settings.CHIEF_APPROVAL_REQUEST_TEMPLATE_ID,
+                personalisation={
+                    "requirement_link": reverse(
+                        "approval",
+                        kwargs={
+                            'requirement_id': self.uuid}
+                        ),
+                },
+            )
+
+        AuditLog.objects.create(
+            user=self.hiring_manager,
+            message="Requirement created, approval requested from a chief",
+            requirement=self,
+        )
 
     @property
     def nice_name(self):
@@ -227,19 +287,23 @@ class Requirement(models.Model):
 
         return False
 
-    @transition(field=state, source=SUBMITTED, target=CHIEF_APPROVAL_REQUIRED)
-    def give_hiring_manager_approval(self, chief_email):
-        # Email Hiring manager
-        send_email(
-            to=chief_email,
-            template_id=settings.CHIEF_APPROVAL_REQUEST_TEMPLATE_ID,
-            personalisation={
-                "requirement_link": reverse("approval", kwargs={'requirement_id': self.uuid}),
-            },
-        )
-
-    @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=BUS_OPS_APPROVAL_REQUIRED)
+    @transition(field=state, source=[CHIEF_APPROVAL_REQUIRED, CHIEF_REQUESTS_CHANGES], target=BUS_OPS_APPROVAL_REQUIRED)
     def give_chief_approval(self):
+        pass
+        # send_email(
+        #     to=self.email_of_chief,
+        #     template_id=settings.CHIEF_APPROVAL_REQUEST_TEMPLATE_ID,
+        #     personalisation={
+        #         "requirement_link": reverse(
+        #             "approval",
+        #             kwargs={
+        #                 'requirement_id': self.uuid}
+        #         ),
+        #     },
+        # )
+
+    @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=CHIEF_REQUESTS_CHANGES)
+    def request_changes_chief(self):
         pass
         # Get group to send email to
         #send_email()

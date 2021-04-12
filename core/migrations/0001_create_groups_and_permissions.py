@@ -54,7 +54,7 @@ def create_groups_and_permissions(apps, schema_editor):
     ))
 
     hr, _ = Group.objects.get_or_create(
-        name="Finance",
+        name="HR",
     )
     hr.permissions.add(Permission.objects.create(
         codename='can_give_hr_approval',

@@ -1,0 +1,14 @@
+<details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          Request changes
+        </span>
+    </summary>
+    <div class="govuk-details__text">
+        <form action="/request-changes/{{ requirement_id }}/" method="post" novalidate>
+            {% csrf_token %}
+            {% include "includes/govt_uk_form.html" with form=request_changes_form %}
+            <input class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" value="Request changes">
+        </form>
+    </div>
+</details>

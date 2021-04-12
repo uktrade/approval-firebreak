@@ -1,0 +1,34 @@
+<dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Project name/title of role
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.project_name_role_title }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Submitted by
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.hiring_manager.first_name }} {{ requirement.hiring_manager.last_name }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Submitted on
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.submitted_on }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Current state
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.nice_name }}
+        </dd>
+    </div>
+</dl>

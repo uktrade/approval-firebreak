@@ -1,3 +1,13 @@
+
+DEMO TODO
+=========
+
+List of users within system
+Audit log from requirement (who signed off)
+Order requirements by what user needs to act on (colour code)
+Request changes functionality
+
+
 finance
 commercial
 
@@ -87,6 +97,13 @@ Talk through how to add and remove approval groups
 Pre-populate fields
 
 Demo audit trail
+
+
+Talk about people finder integration
+
+Talk about SSO integration
+
+Activity Stream integration etc
 
 
 

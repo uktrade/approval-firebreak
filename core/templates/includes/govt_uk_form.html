@@ -29,9 +29,7 @@
                 </span>
             {% endfor %}
         {% endif %}
-    {% if field.field.widget.input_type != 'checkbox' %}
-        {{ field }}
-    {% else %}
+    {% if field.field.widget.input_type == 'checkbox' %}
         <div class="govuk-checkboxes">
             <div class="govuk-checkboxes__item">
                 {{ field }}
@@ -40,6 +38,8 @@
                 </label>
             </div>
         </div>
+    {% else %}
+        {{ field }}
     {% endif %}
     </div>
 {% endfor %}

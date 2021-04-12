@@ -14,8 +14,9 @@ from workflow.forms import (
     NewRequirementForm,
 )
 from workflow.models import (
+    AuditLog,
+    Comment,
     Requirement,
-    SUBMITTED,
     CHIEF_APPROVAL_REQUIRED,
     BUS_OPS_APPROVAL_REQUIRED,
     IN_PROGRESS,
@@ -40,17 +41,17 @@ class RequirementsView(ListView):
 
     def get_queryset(self):
         requirements = Requirement.objects.filter(
-            #state=SUBMITTED,
-            submitter=self.request.user,
+            hiring_manager=self.request.user,
         )
 
+        # if self.request.user.has_perm(
+        #     "workflow.can_give_hiring_manager_approval"
+        # ):
+        #     requirements = Requirement.objects.filter(
+        #         state=CHIEF_APPROVAL_REQUIRED,
+        #     )
+        # el
         if self.request.user.has_perm(
-            "workflow.can_give_hiring_manager_approval"
-        ):
-            requirements = Requirement.objects.filter(
-                state=SUBMITTED
-            )
-        elif self.request.user.has_perm(
             "workflow.can_give_chief_approval"
         ):
             requirements = Requirement.objects.filter(
@@ -67,7 +68,7 @@ class RequirementsView(ListView):
                 state=IN_PROGRESS
             )
 
-        return requirements
+        return requirements.order_by("-submitted_on")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -88,16 +89,6 @@ class NewRequirementView(View):
         form = self.form_class(request.POST, hiring_manager=request.user)
         if form.is_valid():
             requirement = form.save()
-
-            # Email Hiring manager
-            send_email(
-                to=requirement.hiring_manager.email,
-                template_id=settings.HIRING_MANAGER_NEW_REQUEST_TEMPLATE_ID,
-                personalisation={
-                    "submitter_name": request.user.get_full_name(),
-                },
-            )
-
             return HttpResponseRedirect(
                 reverse("requirement_submitted")
             )
@@ -116,7 +107,7 @@ def get_form_and_template(requirement, content=None):
     if requirement.state == CHIEF_APPROVAL_REQUIRED:
         # Needs Chief approval
         form = ChiefApprovalForm(content)
-        template_name = "chief_approval.html"
+        template_name = "approval.html"
         success_view = "approved"
     # elif requirement.state == "in_progress":
     #     form = RequirementFinanceStepForm(content)
@@ -150,8 +141,6 @@ class ApprovalView(View):
                 )
             )
 
-        request_changes_form = RequestChangesForm()
-
         if not requirement:
             raise Http404("Cannot find requirement")
 
@@ -159,7 +148,7 @@ class ApprovalView(View):
 
         return render(request, template_name, {
             'form': form,
-            "request_changes_form": request_changes_form,
+            "request_changes_form": RequestChangesForm(),
             'requirement': requirement,
         })
 
@@ -185,6 +174,7 @@ class ApprovalView(View):
 
         return render(request, self.template_name, {
             'form': form,
+            "request_changes_form": RequestChangesForm(),
             'requirement': requirement,
         })
 
@@ -210,4 +200,82 @@ class NeedsAuthorisationView(View):
 
         return render(request, self.template_name, {
             "current_state": REQUIREMENT_STATES[requirement.state]["nice_name"],
+        })
+
+
+class UsersView(View):
+    template_name = 'users.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
+class ProcessOwnerView(View):
+    template_name = 'process_owner.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
+class RequestSubmittedView(View):
+    template_name = 'changes_requested.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
+# Request changes
+class RequestChangesView(View):
+    def get(self, request, *args, **kwargs):
+        requirement_id = self.kwargs['requirement_id']
+        requirement = Requirement.objects.filter(
+            uuid=requirement_id,
+        ).first()
+
+        if not requirement:
+            raise Http404("Cannot find requirement")
+
+        form = RequestChangesForm()
+
+        return render(request, self.template_name, {
+            'form': form,
+            'requirement': requirement,
+        })
+
+    def post(self, request, *args, **kwargs):
+        requirement_id = self.kwargs['requirement_id']
+        requirement = Requirement.objects.filter(
+            uuid=requirement_id,
+        ).first()
+
+        if not requirement:
+            raise Http404("Cannot find requirement")
+
+        form = RequestChangesForm(request.POST)
+
+        if form.is_valid():
+            message = form.cleaned_data['message']
+
+            Comment.objects.create(
+                message=message,
+                user=request.user,
+                requirement=requirement,
+            )
+
+            requirement.request_changes_chief()
+            requirement.save()
+
+            AuditLog.objects.create(
+                message="Changes were requested",
+                user=request.user,
+                requirement=requirement,
+            )
+
+            return HttpResponseRedirect(
+                reverse("change_request_submitted")
+            )
+
+        return render(request, self.template_name, {
+            'form': form,
+            'requirement': requirement,
         })
