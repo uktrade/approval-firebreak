@@ -7,7 +7,12 @@ from django.urls import reverse
 
 from django_fsm import FSMField, transition
 
-from chartofaccount.models import Directorate
+from chartofaccount.models import (
+    DepartmentalGroup,
+    Directorate,
+    CostCentre,
+)
+
 from core.notify import send_email
 
 from workflow.custom_fields import YesNoField
@@ -83,8 +88,8 @@ class Requirement(models.Model):
     CONTRACTOR_TYPE_GENERALIST = 'generalist'
     CONTRACTOR_TYPE_SPECIALIST = 'specialist'
     CONTRACTOR_TYPE_CHOICES = [
-        (CONTRACTOR_TYPE_GENERALIST, 'generalist'),
-        (CONTRACTOR_TYPE_SPECIALIST, 'specialist'),
+        (CONTRACTOR_TYPE_GENERALIST, 'Generalist'),
+        (CONTRACTOR_TYPE_SPECIALIST, 'Specialist'),
     ]
     SECURITY_CLEARANCE_BPSS = "BPSS"
     SECURITY_CLEARANCE_SC = "sc"
@@ -92,9 +97,9 @@ class Requirement(models.Model):
     SECURITY_CLEARANCE_CTC = "ctc"
     SECURITY_CLEARANCE_CHOICES = [
         (SECURITY_CLEARANCE_BPSS , "BPSS"),
-        (SECURITY_CLEARANCE_SC , "sc"),
-        (SECURITY_CLEARANCE_DV , "dv"),
-        (SECURITY_CLEARANCE_CTC , "ctc"),
+        (SECURITY_CLEARANCE_SC , "SC"),
+        (SECURITY_CLEARANCE_DV , "DV"),
+        (SECURITY_CLEARANCE_CTC , "CTC"),
     ]
     IR35_IN = 'in'
     IR35_OUT = 'out'
@@ -127,7 +132,7 @@ class Requirement(models.Model):
         choices=IR35_CHOICES,
         verbose_name="IN / OUT of Scope of IR35"
     )
-    new_requirement = models.BooleanField(default=True, verbose_name="New")
+    new_requirement = YesNoField(verbose_name="New")
     name_of_contractor = models.CharField(
         max_length=255,
         blank=True,
@@ -154,18 +159,12 @@ class Requirement(models.Model):
         verbose_name="Category of Interim"
     )
     part_b_business_case = models.TextField(
-        null=True,
-        blank=True,
         verbose_name="Business Case: Please detail why the interim resource is required."
     )
     part_b_impact = models.TextField(
-        null=True,
-        blank=True,
         verbose_name="What would be the impact of not filling this requirement."
     )
     part_b_main_reason = models.TextField(
-        null=True,
-        blank=True,
         verbose_name="What are the main reasons why this role has not been filled by a substantive Civil Servant. Please detail the strategic workforce plan for this role after the assignment end date:"
     )
     job_description_submitted = YesNoField(default=False)
@@ -173,8 +172,6 @@ class Requirement(models.Model):
     directorate = models.ForeignKey(
         Directorate,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
         related_name="directorates",
     )
 
@@ -203,7 +200,18 @@ class Requirement(models.Model):
         related_name="commercial_approvals",
     )
     project_name_title_of_role = models.CharField(max_length=255)
-    cost_centre_code = models.CharField(max_length=255)
+    group = models.ForeignKey(
+        DepartmentalGroup,
+        on_delete=models.CASCADE,
+        related_name="groups",
+    )
+    cost_centre_code = models.ForeignKey(
+        CostCentre,
+        on_delete=models.CASCADE,
+        related_name="costcentres",
+        verbose_name="Cost Centre/Team"
+    )
+
     name_of_chief = models.CharField(max_length=255)
     email_of_chief = models.EmailField()
     slot_codes = models.CharField(max_length=255)

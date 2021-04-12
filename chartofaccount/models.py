@@ -18,6 +18,8 @@ class Directorate(models.Model):
     )
     directorate_name = models.CharField("Directorate Name", max_length=300)
     group = models.ForeignKey(DepartmentalGroup, on_delete=models.PROTECT)
+    def __str__(self):
+        return self.directorate_name
 
     class Meta:
         verbose_name = "Directorate"
@@ -33,7 +35,7 @@ class CostCentre(models.Model):
     directorate = models.ForeignKey(Directorate, on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.full_name
+        return f"{self.cost_centre_code} - {self.cost_centre_name}"
 
     class Meta:
         verbose_name = "Cost Centre"

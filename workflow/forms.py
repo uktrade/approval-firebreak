@@ -97,6 +97,7 @@ class NewRequirementForm(GovFormattedModelForm):
         model = Requirement
         fields = [
             "project_name_role_title",
+            "group",
             "directorate",
             "cost_centre_code",
             "authorising_director",
