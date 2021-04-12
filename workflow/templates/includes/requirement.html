@@ -1,13 +1,5 @@
-<h2 class="govuk-heading-m">Requirement overview</h2>
+<h2 class="govuk-heading-m">{{ requirement.project_name_role_title }}</h2>
 <dl class="govuk-summary-list">
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-            Project name/title of role
-        </dt>
-        <dd class="govuk-summary-list__value">
-            {{ requirement.project_name_role_title }}
-        </dd>
-    </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
             Current state
@@ -72,7 +64,7 @@
                     Scope of IR35
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ requirement.IR35 }}
+                    {% if requirement.IR35 %}Yes{% else %}No{% endif %}
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -80,7 +72,7 @@
                     New Requirement
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ requirement.new_requirement }}
+                    {% if requirement.new_requirement %}Yes{% else %}No{% endif %}
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -96,7 +88,7 @@
                     UK based
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ requirement.uk_based }}
+                    {% if requirement.uk_based %}Yes{% else %}No{% endif %}
                 </dd>
             </div>
             {% if not requirement.uk_based %}
@@ -162,7 +154,7 @@
                     Job description submitted
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    {{ requirement.job_description_submitted }}
+                    {% if requirement.job_description_submitted %}Yes{% else %}No{% endif %}
                 </dd>
             </div>
         </dl>
@@ -177,33 +169,33 @@
     </summary>
     <div class="govuk-details__text">
         <h2 class="govuk-heading-m">Audit log</h2>
-        <dl class="govuk-summary-list">
-            {% for audit_item in audit_log %}
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Action at
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            {{ audit_item.action_at }}
-                        </dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Action
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            {{ audit_item.message }}
-                        </dd>
-                    </div>
-                    <div class="govuk-summary-list__row audit-log-item">
-                        <dt class="govuk-summary-list__key">
-                            User
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            {{ audit_item.user.first_name }} {{ audit_item.user.last_name }}
-                        </dd>
-                    </div>
-            {% endfor %}
-        </dl>
+        {% for audit_item in requirement.audit_log.all %}
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Action at
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ audit_item.action_at }}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Action
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ audit_item.message }}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row audit-log-item">
+                    <dt class="govuk-summary-list__key">
+                        User
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ audit_item.user.first_name }} {{ audit_item.user.last_name }}
+                    </dd>
+                </div>
+            </dl>
+        {% endfor %}
     </div>
 </details>

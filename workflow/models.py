@@ -97,6 +97,7 @@ class AuditLog(models.Model):
     requirement = models.ForeignKey(
         "Requirement",
         on_delete=models.CASCADE,
+        related_name="audit_log"
     )
 
 
@@ -251,13 +252,21 @@ class Requirement(models.Model):
         super().save(*args, **kwargs)
         # Email chief
         if self.state == CHIEF_APPROVAL_REQUIRED:
-            self.send_chiefs_email("A new hiring requirement has been submitted for approval")
+            self.send_chiefs_email("A hiring requirement has been submitted for approval")
 
-        AuditLog.objects.create(
-            user=self.hiring_manager,
-            message="Requirement created, approval requested from a chief",
-            requirement=self,
-        )
+            # Check for existing audit log
+            audit_count = AuditLog.objects.count()
+
+            if audit_count == 0:
+                message = "Requirement created, approval requested from a chief"
+            else:
+                message = "Requirement updated, approval requested from a chief"
+
+            AuditLog.objects.create(
+                user=self.hiring_manager,
+                message=message,
+                requirement=self,
+            )
 
     def send_chiefs_email(self, subject):
         chiefs_group = Group.objects.filter(
@@ -295,7 +304,7 @@ class Requirement(models.Model):
         return False
 
     @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=BUS_OPS_APPROVAL_REQUIRED)
-    def give_chief_approval(self):
+    def give_chief_approval(self, approver):
         bus_ops_group = Group.objects.filter(
             name="Business Operations",
         ).first()
@@ -318,6 +327,12 @@ class Requirement(models.Model):
                     ),
                 },
             )
+
+        AuditLog.objects.create(
+            user=approver,
+            message="Chief gave approval, requirement submitted to business operations",
+            requirement=self,
+        )
 
     @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=CHIEF_REQUESTS_CHANGES)
     def request_changes_chief(self):

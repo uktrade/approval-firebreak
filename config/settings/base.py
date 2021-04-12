@@ -70,6 +70,7 @@ THIRD_PARTY_APPS = [
     "authbroker_client",
     "simple_history",
     "webpack_loader",
+    "django_tables2",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS

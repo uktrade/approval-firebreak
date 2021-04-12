@@ -9,9 +9,11 @@ from django.conf import settings
 from core.notify import send_email
 
 from workflow.forms import (
+    BusOpsApprovalForm,
     ChiefApprovalForm,
     RequestChangesForm,
     NewRequirementForm,
+    SearchForm,
 )
 from workflow.models import (
     AuditLog,
@@ -37,7 +39,14 @@ in_progress_perms = [
 class RequirementsView(ListView):
     template_name = 'requirements.html'
     model = Requirement
-    paginate_by = 1000  # if pagination is desired
+    paginate_by = 1000
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_term = self.request.GET.get("search_term", None)
+        context['search_term'] = search_term
+        context['search_form'] = SearchForm(initial={"search_term": search_term})
+        return context
 
     def get_queryset(self):
         requirements = Requirement.objects.filter(
@@ -61,6 +70,12 @@ class RequirementsView(ListView):
                 state=IN_PROGRESS
             )
 
+        if self.request.GET.get("search_term"):
+            search_term = self.request.GET.get("search_term")
+            requirements = requirements.filter(
+                project_name_role_title__icontains=search_term,
+            )
+
         return requirements.order_by("-submitted_on")
 
 
@@ -82,10 +97,6 @@ class RequirementView(View):
             acted_on=False,
         ).order_by("-submitted_at")
 
-        self.audit_log = AuditLog.objects.filter(
-            requirement=self.requirement,
-        ).order_by("-action_at")
-
         return super(RequirementView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -95,7 +106,6 @@ class RequirementView(View):
             "form": form,
             "requirement": self.requirement,
             "comments": self.comments,
-            "audit_log": self.audit_log,
         })
 
     def post(self, request, *args, **kwargs):
@@ -122,7 +132,6 @@ class RequirementView(View):
             "form": form,
             "requirement": self.requirement,
             "comments": self.comments,
-            "audit_log": self.audit_log,
         })
 
 
@@ -141,7 +150,7 @@ class NewRequirementView(View):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(
-                reverse("requirement_submitted")
+                reverse("requirements")
             )
 
         return render(request, self.template_name, {'form': form})
@@ -160,15 +169,15 @@ def get_form_and_template(requirement, content=None):
         form = ChiefApprovalForm(content)
         template_name = "approval.html"
         success_view = "approved"
-    # elif requirement.state == "in_progress":
-    #     form = RequirementFinanceStepForm(content)
-    #     template_name = "finance_approval.html"
-    #     success_view = "approved"
+    if requirement.state == BUS_OPS_APPROVAL_REQUIRED:
+        # Needs Chief approval
+        form = BusOpsApprovalForm(content)
+        template_name = "approval.html"
+        success_view = "approved"
 
     return form, template_name, success_view
 
 
-# Approval
 class ApprovalView(View):
     def get(self, request, *args, **kwargs):
         requirement_id = self.kwargs['requirement_id']
@@ -218,7 +227,7 @@ class ApprovalView(View):
         )
 
         if form.is_valid():
-            form.save(requirement)
+            form.save(requirement, request.user)
             return HttpResponseRedirect(
                 reverse(success_view)
             )
@@ -237,33 +246,27 @@ class ApprovedView(View):
         return render(request, self.template_name)
 
 
-class UsersView(ListView):
-    template_name = 'users.html'
-    model=Group
-
-    def get_queryset(self):
-        user_list = []
-        groups = Group.objects.all()
-        for group in groups:
-            users = group.user_set.all()
-            for user in users:
-                dict = {
-                            "group": group.name,
-                            "username": f"{user.first_name} {user.last_name}",
-                            "useremail": user.email
-                }
-                user_list.append(dict)
-        return user_list
-
-    # def get(self, request, *args, **kwargs):
-    #     return render(request, self.template_name)
-
-
-class ProcessOwnerView(View):
+class ProcessOwnerListView(ListView):
+    model = Requirement
+    paginate_by = 100
     template_name = 'process_owner.html'
 
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+    def get_queryset(self):
+        queryset = Requirement.objects.all()
+        if self.request.GET.get("search_term"):
+            search_term = self.request.GET.get("search_term")
+            queryset = Requirement.objects.filter(
+                project_name_role_title__icontains=search_term,
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_term = self.request.GET.get("search_term", None)
+        context['search_term'] = search_term
+        context['search_form'] = SearchForm(initial={"search_term": search_term})
+        return context
 
 
 class RequestSubmittedView(View):
@@ -271,7 +274,6 @@ class RequestSubmittedView(View):
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
-
 
 
 # Request changes
@@ -329,3 +331,22 @@ class RequestChangesView(View):
             'form': form,
             'requirement': requirement,
         })
+
+
+class UsersView(ListView):
+    template_name = 'users.html'
+    model = Group
+
+    def get_queryset(self):
+        user_list = []
+        groups = Group.objects.all()
+        for group in groups:
+            users = group.user_set.all()
+            for user in users:
+                dict = {
+                    "group": group.name,
+                    "username": f"{user.first_name} {user.last_name}",
+                    "useremail": user.email
+                }
+                user_list.append(dict)
+        return user_list

@@ -1,27 +1,23 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-    <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">All requirements</caption>
-        <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Date</th>
-            <th scope="col" class="govuk-table__header">Amount</th>
-        </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">First 6 weeks</th>
-            <td class="govuk-table__cell">£109.80 per week</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Next 33 weeks</th>
-            <td class="govuk-table__cell">£109.80 per week</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Total estimated pay</th>
-            <td class="govuk-table__cell">£4,282.20</td>
-        </tr>
-        </tbody>
-    </table>
+    <h1 class="govuk-heading-l">Requirements</h1>
+    <form action="" method="get" novalidate>
+        {% csrf_token %}
+        {% include "includes/govt_uk_form.html" with form=search_form %}
+        <input class="govuk-button" data-module="govuk-button" type="submit" value="Search">
+    </form>
+    {% if search_term %}
+        <h2 class="govuk-heading-m">Search results for "{{ search_term }}"</h2>
+    {% endif %}
+    <ul class="govuk-list">
+        {% for requirement in object_list %}
+            <li>
+                {% include "includes/requirement.html" with requirement=requirement %}
+            </li>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        {% empty %}
+            <li><p class="govuk-body">No requirements yet.</p></li>
+        {% endfor %}
+    </ul>
 {% endblock %}

@@ -5,7 +5,7 @@ from workflow.views import (
     ApprovedView,
     RequirementView,
     NewRequirementView,
-    ProcessOwnerView,
+    ProcessOwnerListView,
     RequirementsView,
     RequirementSubmittedView,
     RequestChangesView,
@@ -22,6 +22,6 @@ urlpatterns = [
     path("request-submitted/", RequestSubmittedView.as_view(), name="change_request_submitted", ),
     path("approved/", ApprovedView.as_view(), name="approved", ),
     path("requirement/<uuid:requirement_id>/", RequirementView.as_view(), name="requirement", ),
-    path("process-owner/", ProcessOwnerView.as_view(), name="process_owner", ),
+    path("process-owner/", ProcessOwnerListView.as_view(), name="process_owner", ),
     path("users/", UsersView.as_view(), name="workflow_users", ),
 ]

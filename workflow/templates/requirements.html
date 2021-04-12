@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-    <h1 class="govuk-heading-m">Current requirements</h1>
+    <h1 class="govuk-heading-l">Current requirements</h1>
+    <form action="" method="get" novalidate>
+        {% csrf_token %}
+        {% include "includes/govt_uk_form.html" with form=search_form %}
+        <input class="govuk-button" data-module="govuk-button" type="submit" value="Search">
+    </form>
+    {% if search_term %}
+        <h2 class="govuk-heading-m">Search results for "{{ search_term }}"</h2>
+    {% endif %}
     <ul class="govuk-list">
         {% for requirement in object_list %}
             <li>

@@ -21,6 +21,15 @@ class GovFormattedModelForm(forms.ModelForm):
                 widget.attrs.update({'class': 'govuk-input'})
 
 
+class SearchForm(forms.Form):
+    search_term = forms.CharField(
+        label="Search requirements",
+        widget=forms.TextInput(attrs={
+            "class": "govuk-input",
+        })
+    )
+
+
 class RequestChangesForm(forms.Form):
     message = forms.CharField(
         widget=forms.Textarea(attrs={
@@ -41,27 +50,27 @@ class ApprovalForm(forms.Form):
 
 
 class ChiefApprovalForm(ApprovalForm):
-    def save(self, requirement):
-        requirement.give_chief_approval()
+    def save(self, requirement, approver):
+        requirement.give_chief_approval(approver)
         requirement.save()
 
 
 class BusOpsApprovalForm(ApprovalForm):
-    def save(self, requirement):
-        requirement.give_busops_approval()
+    def save(self, requirement, approver):
+        requirement.give_busops_approval(approver)
         requirement.save()
 
 
-class DirectorApprovalForm(ApprovalForm):
-    def save(self, requirement):
-        requirement.give_chief_approval()
-        requirement.save()
-
-
-class DHCOOApprovalForm(ApprovalForm):
-    def save(self, requirement):
-        requirement.give_chief_approval()
-        requirement.save()
+# class DirectorApprovalForm(ApprovalForm):
+#     def save(self, requirement):
+#         requirement.give_chief_approval()
+#         requirement.save()
+#
+#
+# class DHCOOApprovalForm(ApprovalForm):
+#     def save(self, requirement):
+#         requirement.give_chief_approval()
+#         requirement.save()
 
 
 class NewRequirementForm(GovFormattedModelForm):
@@ -87,8 +96,8 @@ class NewRequirementForm(GovFormattedModelForm):
             "job_description_submitted",
         ]
         widgets = {
-            'start_date': DateInput(attrs={'type': 'date'}),
-            'end_date': DateInput(attrs={'type': 'date'}),
+            'start_date': DateInput(format="%Y-%m-%d", attrs={'type': 'date'}),
+            'end_date': DateInput(format="%Y-%m-%d", attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
