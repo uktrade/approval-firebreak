@@ -5,15 +5,28 @@
     <ul class="govuk-list">
     {% regroup object_list by group as group_list %}
     {% for group in group_list %}
-        <li>{{ group.grouper }}
-        <ul>
-                {% for username in group.list %}
-                  <li>{{ username.username }}</li>
+        <h2 class="govuk-heading-s">{{ group.grouper }}</h2>
+        <dl class="govuk-summary-list">
+                {% for user in group.list %}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            User name
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ user.username }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Email
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ user.useremail }}
+                        </dd>
+                    </div>
                 {% endfor %}
-        </ul>
+        </dl>
 
-
-        </li>
     {% endfor %}
 
 

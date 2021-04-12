@@ -249,8 +249,9 @@ class UsersView(ListView):
             for user in users:
                 dict = {
                             "group": group.name,
-                            "username": f"{user.first_name} {user.last_name}"
-                        }
+                            "username": f"{user.first_name} {user.last_name}",
+                            "useremail": user.email
+                }
                 user_list.append(dict)
         return user_list
 
