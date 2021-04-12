@@ -10,7 +10,7 @@ from django_fsm import FSMField, transition
 from chartofaccount.models import Directorate
 from core.notify import send_email
 
-
+from workflow.custom_fields import YesNoField
 User = get_user_model()
 
 
@@ -168,7 +168,7 @@ class Requirement(models.Model):
         blank=True,
         verbose_name="What are the main reasons why this role has not been filled by a substantive Civil Servant. Please detail the strategic workforce plan for this role after the assignment end date:"
     )
-    job_description_submitted = models.BooleanField(default=False)
+    job_description_submitted = YesNoField(default=False)
 
     directorate = models.ForeignKey(
         Directorate,

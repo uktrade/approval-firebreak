@@ -5,6 +5,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django_fsm
 import uuid
+import workflow.custom_fields
 
 
 class Migration(migrations.Migration):
@@ -46,7 +47,7 @@ class Migration(migrations.Migration):
                 ('part_b_business_case', models.TextField(blank=True, null=True, verbose_name='Business Case: Please detail why the interim resource is required.')),
                 ('part_b_impact', models.TextField(blank=True, null=True, verbose_name='What would be the impact of not filling this requirement.')),
                 ('part_b_main_reason', models.TextField(blank=True, null=True, verbose_name='What are the main reasons why this role has not been filled by a substantive Civil Servant. Please detail the strategic workforce plan for this role after the assignment end date:')),
-                ('job_description_submitted', models.BooleanField(default=False)),
+                ('job_description_submitted', workflow.custom_fields.YesNoField(default=False)),
                 ('state', django_fsm.FSMField(default='submitted', max_length=50)),
                 ('project_name_title_of_role', models.CharField(max_length=255)),
                 ('cost_centre_code', models.CharField(max_length=255)),
