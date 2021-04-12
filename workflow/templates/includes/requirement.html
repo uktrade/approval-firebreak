@@ -1,3 +1,4 @@
+<h2 class="govuk-heading-m">Requirement overview</h2>
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
@@ -5,6 +6,14 @@
         </dt>
         <dd class="govuk-summary-list__value">
             {{ requirement.project_name_role_title }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Current state
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.nice_name }}
         </dd>
     </div>
     <div class="govuk-summary-list__row">
@@ -23,12 +32,64 @@
             {{ requirement.submitted_on }}
         </dd>
     </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-            Current state
-        </dt>
-        <dd class="govuk-summary-list__value">
-            {{ requirement.nice_name }}
-        </dd>
-    </div>
 </dl>
+
+<details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          View requirement details
+        </span>
+    </summary>
+    <div class="govuk-details__text">
+        <h2 class="govuk-heading-m">Requirement details</h2>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Cost Centre Code
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    {{ requirement.cost_centre_code }}
+                </dd>
+            </div>
+        </dl>
+    </div>
+</details>
+
+<details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          View audit trail
+        </span>
+    </summary>
+    <div class="govuk-details__text">
+        <h2 class="govuk-heading-m">Audit log</h2>
+        <dl class="govuk-summary-list">
+            {% for audit_item in audit_log %}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Action at
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ audit_item.action_at }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Action
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ audit_item.message }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row audit-log-item">
+                        <dt class="govuk-summary-list__key">
+                            User
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ audit_item.user.email }}
+                        </dd>
+                    </div>
+            {% endfor %}
+        </dl>
+    </div>
+</details>

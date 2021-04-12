@@ -18,3 +18,11 @@ $govuk-image-url-function: frontend-image-url;
 //@import "govuk-overrides/header";
 //@import "govuk-overrides/main";
 //@import "govuk-overrides/footer";
+
+.comment-meta {
+  color: $govuk-secondary-text-colour;
+}
+//
+//.audit-log-item {
+//  margin-bottom: 20px!important;
+//}

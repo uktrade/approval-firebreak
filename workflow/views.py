@@ -44,13 +44,6 @@ class RequirementsView(ListView):
             hiring_manager=self.request.user,
         )
 
-        # if self.request.user.has_perm(
-        #     "workflow.can_give_hiring_manager_approval"
-        # ):
-        #     requirements = Requirement.objects.filter(
-        #         state=CHIEF_APPROVAL_REQUIRED,
-        #     )
-        # el
         if self.request.user.has_perm(
             "workflow.can_give_chief_approval"
         ):
@@ -70,9 +63,67 @@ class RequirementsView(ListView):
 
         return requirements.order_by("-submitted_on")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+
+class RequirementView(View):
+    template_name = 'requirement.html'
+    form_class = NewRequirementForm
+
+    def dispatch(self, request, *args, **kwargs):
+        requirement_id = self.kwargs['requirement_id']
+        self.requirement = Requirement.objects.filter(
+            uuid=requirement_id,
+        ).first()
+
+        if not self.requirement:
+            raise Http404("Cannot find requirement")
+
+        self.comments = Comment.objects.filter(
+            requirement=self.requirement,
+            acted_on=False,
+        ).order_by("-submitted_at")
+
+        self.audit_log = AuditLog.objects.filter(
+            requirement=self.requirement,
+        ).order_by("-action_at")
+
+        return super(RequirementView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class(instance=self.requirement)
+
+        return render(request, self.template_name, {
+            "form": form,
+            "requirement": self.requirement,
+            "comments": self.comments,
+            "audit_log": self.audit_log,
+        })
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(
+            request.POST,
+            instance=self.requirement,
+            hiring_manager=request.user
+        )
+
+        if form.is_valid():
+            form.save()
+            self.requirement.made_changes_chief()
+            self.requirement.save()
+
+            for comment in self.comments:
+                comment.acted_on = True
+                comment.save()
+
+            return HttpResponseRedirect(
+                reverse("requirements")
+            )
+
+        return render(request, self.template_name, {
+            "form": form,
+            "requirement": self.requirement,
+            "comments": self.comments,
+            "audit_log": self.audit_log,
+        })
 
 
 # New requirement
@@ -88,7 +139,7 @@ class NewRequirementView(View):
         # TODO - check that user is in hiring manager group
         form = self.form_class(request.POST, hiring_manager=request.user)
         if form.is_valid():
-            requirement = form.save()
+            form.save()
             return HttpResponseRedirect(
                 reverse("requirement_submitted")
             )
@@ -136,7 +187,7 @@ class ApprovalView(View):
         if not found_perm:
             return HttpResponseRedirect(
                 reverse(
-                    "needs_auth",
+                    "requirement",
                     kwargs={"requirement_id": requirement_id}
                 )
             )
@@ -184,23 +235,6 @@ class ApprovedView(View):
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
-
-
-class NeedsAuthorisationView(View):
-    template_name = 'needs_auth.html'
-
-    def get(self, request, *args, **kwargs):
-        requirement_id = self.kwargs['requirement_id']
-        requirement = Requirement.objects.filter(
-            uuid=requirement_id,
-        ).first()
-
-        if not requirement:
-            raise Http404("Cannot find requirement")
-
-        return render(request, self.template_name, {
-            "current_state": REQUIREMENT_STATES[requirement.state]["nice_name"],
-        })
 
 
 class UsersView(View):

@@ -3,7 +3,7 @@ from django.urls import path
 from workflow.views import (
     ApprovalView,
     ApprovedView,
-    NeedsAuthorisationView,
+    RequirementView,
     NewRequirementView,
     ProcessOwnerView,
     RequirementsView,
@@ -21,7 +21,7 @@ urlpatterns = [
     path("request-changes/<uuid:requirement_id>/", RequestChangesView.as_view(), name="request_changes", ),
     path("request-submitted/", RequestSubmittedView.as_view(), name="change_request_submitted", ),
     path("approved/", ApprovedView.as_view(), name="approved", ),
-    path("needs-auth/<uuid:requirement_id>/", NeedsAuthorisationView.as_view(), name="needs_auth", ),
+    path("requirement/<uuid:requirement_id>/", RequirementView.as_view(), name="requirement", ),
     path("process-owner/", ProcessOwnerView.as_view(), name="process_owner", ),
     path("users/", UsersView.as_view(), name="workflow_users", ),
 ]

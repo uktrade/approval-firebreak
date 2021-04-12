@@ -9,6 +9,14 @@
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
+            Current state
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.nice_name }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
             Submitted by
         </dt>
         <dd class="govuk-summary-list__value">
@@ -21,14 +29,6 @@
         </dt>
         <dd class="govuk-summary-list__value">
             {{ requirement.submitted_on }}
-        </dd>
-    </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-            Current state
-        </dt>
-        <dd class="govuk-summary-list__value">
-            {{ requirement.nice_name }}
         </dd>
     </div>
 </dl>

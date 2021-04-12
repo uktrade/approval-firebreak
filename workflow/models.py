@@ -116,6 +116,9 @@ class Comment(models.Model):
         "Requirement",
         on_delete=models.CASCADE,
     )
+    acted_on = models.BooleanField(
+        default=False,
+    )
 
 
 class Requirement(models.Model):
@@ -247,6 +250,16 @@ class Requirement(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         # Email chief
+        if self.state == CHIEF_APPROVAL_REQUIRED:
+            self.send_chiefs_email("A new hiring requirement has been submitted for approval")
+
+        AuditLog.objects.create(
+            user=self.hiring_manager,
+            message="Requirement created, approval requested from a chief",
+            requirement=self,
+        )
+
+    def send_chiefs_email(self, subject):
         chiefs_group = Group.objects.filter(
             name="Chiefs",
         ).first()
@@ -257,8 +270,8 @@ class Requirement(models.Model):
 
         for chief in chiefs:
             send_email(
-                subject="A new hiring requirement has been submitted for approval",
-                message=f"Please approve a new hiring requirement at http://localhost:8000/approval/{self.uuid}/",
+                subject=subject,
+                message=f"Please approve the hiring requirement at http://localhost:8000/approval/{self.uuid}/",
                 to=chief.email,
                 template_id=settings.CHIEF_APPROVAL_REQUEST_TEMPLATE_ID,
                 personalisation={
@@ -266,15 +279,9 @@ class Requirement(models.Model):
                         "approval",
                         kwargs={
                             'requirement_id': self.uuid}
-                        ),
+                    ),
                 },
             )
-
-        AuditLog.objects.create(
-            user=self.hiring_manager,
-            message="Requirement created, approval requested from a chief",
-            requirement=self,
-        )
 
     @property
     def nice_name(self):
@@ -287,26 +294,50 @@ class Requirement(models.Model):
 
         return False
 
-    @transition(field=state, source=[CHIEF_APPROVAL_REQUIRED, CHIEF_REQUESTS_CHANGES], target=BUS_OPS_APPROVAL_REQUIRED)
+    @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=BUS_OPS_APPROVAL_REQUIRED)
     def give_chief_approval(self):
-        pass
-        # send_email(
-        #     to=self.email_of_chief,
-        #     template_id=settings.CHIEF_APPROVAL_REQUEST_TEMPLATE_ID,
-        #     personalisation={
-        #         "requirement_link": reverse(
-        #             "approval",
-        #             kwargs={
-        #                 'requirement_id': self.uuid}
-        #         ),
-        #     },
-        # )
+        bus_ops_group = Group.objects.filter(
+            name="Business Operations",
+        ).first()
+
+        bus_ops = User.objects.filter(
+            groups=bus_ops_group,
+        )
+
+        for bus_op in bus_ops:
+            send_email(
+                subject="A hiring requirement is ready for your approval",
+                message=f"Please see http://localhost:8000/requirement/{self.uuid}/",
+                to=bus_op.email,
+                template_id=settings.BUS_OPS_APPROVAL_REQUEST_TEMPLATE_ID,
+                personalisation={
+                    "requirement_link": reverse(
+                        "approval",
+                        kwargs={
+                            'requirement_id': self.uuid}
+                    ),
+                },
+            )
 
     @transition(field=state, source=CHIEF_APPROVAL_REQUIRED, target=CHIEF_REQUESTS_CHANGES)
     def request_changes_chief(self):
-        pass
-        # Get group to send email to
-        #send_email()
+        send_email(
+            subject="Changes have been requested to your hiring requirement",
+            message=f"Please see http://localhost:8000/requirement/{self.uuid}/",
+            to=self.hiring_manager.email,
+            template_id=settings.HIRING_MANAGER_CHANGES_REQUESTED_TEMPLATE_ID,
+            personalisation={
+                "requirement_link": reverse(
+                    "approval",
+                    kwargs={
+                        'requirement_id': self.uuid}
+                ),
+            },
+        )
+
+    @transition(field=state, source=CHIEF_REQUESTS_CHANGES, target=CHIEF_APPROVAL_REQUIRED)
+    def made_changes_chief(self):
+        self.send_chiefs_email(subject="A hiring requirement has been resubmitted for approval")
 
     @transition(field=state, source=BUS_OPS_APPROVAL_REQUIRED, target=IN_PROGRESS)
     def give_busops_approval(self):
