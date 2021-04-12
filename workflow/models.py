@@ -173,7 +173,7 @@ class Requirement(models.Model):
         null=True,
         verbose_name="If Nominated Worker - please provide Name of the contractor"
     )
-    uk_based = models.BooleanField(default=True)
+    uk_based = models.BooleanField(default=True, verbose_name="UK based")
     overseas_country = models.CharField(
         max_length=255,
         blank=True,
