@@ -1,7 +1,8 @@
 # Setup
 
 1. `cp .env.example .env`
-2. `make up`
+2. `make build`
+3. `make up`
 
 # DEMO TODO
 

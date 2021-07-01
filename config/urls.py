@@ -10,6 +10,6 @@ import app_with_workflow.views as workflow_views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("auth/", include(authbroker_client_urls)),
-    path("flows/", workflow_views.FlowListView.as_view(), name="flow-list"),
-    path("flow/<int:pk>", workflow_views.FlowListView.as_view(), name="flow"),
+    path("flow/", workflow_views.FlowListView.as_view(), name="flow-list"),
+    path("flow/<int:pk>/", workflow_views.FlowView.as_view(), name="flow"),
 ]
