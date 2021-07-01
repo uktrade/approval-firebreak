@@ -16,4 +16,9 @@ urlpatterns = [
     path(
         "flow/<int:pk>/start", workflow_views.FlowStartView.as_view(), name="flow-start"
     ),
+    path(
+        "flow/<int:pk>/proceed",
+        workflow_views.FlowProceedView.as_view(),
+        name="flow-proceed",
+    ),
 ]

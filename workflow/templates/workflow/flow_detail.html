@@ -5,6 +5,18 @@
 <p>Started: {{ object.started }}</p>
 <p>Finished: {{ object.finished }}</p>
 <p>Is complete: {{ object.is_complete }}</p>
+<p>Current task record: {{ object.current_task_record }}</p>
+<p>{{ step }}</p>
+<div>
+    {% if not task.auto and not object.is_complete %}
+        <form action="proceed" method="POST">
+            {% csrf_token %}
+            {{ form }}
+            <input type="hidden" name="uuid" value="{{ object.current_task_record.uuid }}">
+            <button>Submit</button>
+        </form>
+    {% endif %}
+</div>
 
 <form action="{% url 'flow-start' object.pk %}" method="POST">
     {% csrf_token %}

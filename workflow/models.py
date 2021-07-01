@@ -28,6 +28,10 @@ class Flow(models.Model):
     def workflow(self):
         return WORKFLOW_NAME_WORKFLOW[self.workflow_name]
 
+    @property
+    def current_task_record(self):
+        return self.tasks.filter(finished_at__isnull=True).first()
+
 
 class TaskRecord(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
@@ -48,6 +52,9 @@ class TaskRecord(models.Model):
         null=True,
     )
     task_info = models.JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.step_id} {self.task_name}"
 
 
 class TaskLog(models.Model):

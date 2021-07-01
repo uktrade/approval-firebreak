@@ -20,6 +20,21 @@ class FlowListView(ListView):
 class FlowView(DetailView):
     model = Flow
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        flow = self.get_object()
+        if flow.current_task_record:
+            step = flow.workflow.get_step(flow.current_task_record.step_id)
+            task = step.task
+            context["step"] = step
+            context["task"] = task
+
+            if not task.auto:
+                context["form"] = task.form()
+
+        return context
+
 
 class FlowCreateView(CreateView):
     model = Flow
@@ -32,6 +47,19 @@ class FlowStartView(View):
 
         executor = WorkflowExecutor(flow)
         executor.run_flow(user=self.request.user)
+
+        return JsonResponse({"flow_id": flow.pk})
+
+
+class FlowProceedView(View):
+    def post(self, request, pk, **kwargs):
+        flow = Flow.objects.get(pk=pk)
+
+        task_uuid = self.request.POST["uuid"]
+        executor = WorkflowExecutor(flow)
+        executor.run_flow(
+            user=self.request.user, task_info=self.request.POST, task_uuid=task_uuid
+        )
 
         return JsonResponse({"flow_id": flow.pk})
 
