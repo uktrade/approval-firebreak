@@ -1,61 +1,70 @@
 from django.utils import timezone
 
-from workflow.models import Flow, TaskRecord
-from workflow.task import Task
+from workflow.models import TaskRecord
+
+
+class WorkflowError(Exception):
+    pass
 
 
 class WorkflowExecutor:
-    @staticmethod
-    def start_process():
-        return Flow.objects.create()
+    def __init__(self, flow):
+        self.flow = flow
 
-    @classmethod
-    def resume(cls, task_record_uuid, task_info: dict = None):
-        task_record = TaskRecord.objects.get(uuid=task_record_uuid)
+    def run_flow(self, user, task_info=None, task_uuid=None):
+        if task_info is None:
+            task_info = {}
 
-        cls.execute_task(
-            input=task_record.input,
-            task_info=task_info,
-            flow=task_record.flow,
-            user=task_record.user,
-        )
+        # TODO: might be a race condition
+        if self.flow.started and not task_uuid:
+            raise WorkflowError("Flow already started")
 
-    @classmethod
-    def execute_task(cls, input: str, task_info: dict = None, flow=None, user=None):
-        if input == "start":
-            flow = Flow.objects.create()
-        elif input == "end":
-            flow.finished = timezone.now()
-            flow.save()
-            return
-        elif flow is None:  # if input not start this should never happen
-            raise ValueError("flow cannot be None")
+        self.flow.started = timezone.now()
+        self.flow.save()
 
-        task_cls = Task.tasks[input]
+        if task_uuid:
+            current_step = self.flow.workflow.get_step(
+                TaskRecord.objects.get(uuid=task_uuid).step_id
+            )
+        else:
+            current_step = self.flow.workflow.first_step
 
-        task_record, created = TaskRecord.objects.get_or_create(
-            flow=flow,
-            executed_by=user,
-            input=input,
-            defaults={"task_info": task_info},
-        )
+        while current_step:
+            task_record, created = TaskRecord.objects.get_or_create(
+                flow=self.flow,
+                task_name=current_step.task_name,
+                step_id=current_step.step_id,
+                executed_by=None,
+                defaults={"task_info": current_step.task_info},
+            )
 
-        task = task_cls(task_record, flow)
+            task = current_step.task(task_record, self.flow)
 
-        task.setup(**task_info)
+            task.setup(**task_info)
 
-        # the next task has a manual step
-        if not task.auto and created:
-            return task_record
+            # the next task has a manual step
+            if not task.auto and created:
+                return task_record
 
-        output, output_task_info = task.execute(
-            flow=flow, task_record=task_record, **task_info
-        )
+            target, task_output = task.execute(**task_info)
 
-        task_record.finished_at = timezone.now()
-        task_record.output = output
-        task_record.save()
+            # TODO: check target against step target
+            # TODO: do something with task output
+            # TODO: do we want to pass task output to next task
 
-        cls.execute_task(input=output, task_info=output_task_info, flow=flow, user=user)
+            task_record.finished_at = timezone.now()
+            task_record.save()
+
+            current_step = next(
+                (
+                    step
+                    for step in self.flow.workflow.steps
+                    if step.step_id == (target or current_step.target)
+                ),
+                None,
+            )
+
+        self.flow.finished = timezone.now()
+        self.flow.save()
 
         return task_record

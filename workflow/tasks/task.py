@@ -6,7 +6,7 @@ class Task:
         self.flow = flow
 
     def setup(self, **kwargs):
-        raise NotImplementedError
+        pass
 
     def execute(self, **kwargs):
         raise NotImplementedError

@@ -1,6 +1,13 @@
 {% extends 'workflow/base.html' %}
 
+{% block content %}
 <h1>{{ object.workflow_name }}</h1>
 <p>Started: {{ object.started }}</p>
 <p>Finished: {{ object.finished }}</p>
 <p>Is complete: {{ object.is_complete }}</p>
+
+<form action="{% url 'flow-start' object.pk %}" method="POST">
+    {% csrf_token %}
+    <button>Start</button>
+</form>
+{% endblock %}

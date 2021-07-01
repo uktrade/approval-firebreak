@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.utils import timezone
 from django.views import View
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from django.http import JsonResponse
 
 from app_with_workflow.forms import ApproveRequirementForm
 from workflow.executor import WorkflowExecutor
@@ -18,6 +19,21 @@ class FlowListView(ListView):
 
 class FlowView(DetailView):
     model = Flow
+
+
+class FlowCreateView(CreateView):
+    model = Flow
+    fields = ["workflow_name"]
+
+
+class FlowStartView(View):
+    def post(self, request, pk, **kwargs):
+        flow = Flow.objects.get(pk=pk)
+
+        executor = WorkflowExecutor(flow)
+        executor.run_flow(user=self.request.user)
+
+        return JsonResponse({"flow_id": flow.pk})
 
 
 # Starts process
