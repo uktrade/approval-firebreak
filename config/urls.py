@@ -18,4 +18,9 @@ urlpatterns = [
         workflow_views.FlowContinueView.as_view(),
         name="flow-continue",
     ),
+    path(
+        "flow/<int:pk>/diagram",
+        workflow_views.FlowDiagramView.as_view(),
+        name="flow-diagram",
+    ),
 ]

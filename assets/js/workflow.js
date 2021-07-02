@@ -3,4 +3,4 @@ import dagre from "cytoscape-dagre";
 
 cytoscape.use(dagre);
 
-export const foo = "FOO";
+export { cytoscape };

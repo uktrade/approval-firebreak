@@ -68,11 +68,7 @@
     </div>
     {% include "includes/footer.html" %}
     {% render_bundle 'main' 'js' %}
-{#    {% block scripts %}#}
-{#        <script src="/static/govuk/all.js"></script>#}
-{#        <script>#}
-{#            window.GOVUKFrontend.initAll()#}
-{#        </script>#}
-{#    {% endblock %}#}
+    {% block script %}
+    {% endblock %}
 </body>
 </html>

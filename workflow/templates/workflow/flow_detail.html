@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-
-{% block main_content %}
+{% extends 'base.html' %} {% block main_content %}
 <h1>{{ object.workflow_name }}</h1>
 <p>Started: {{ object.started }}</p>
 <p>Finished: {{ object.finished }}</p>
@@ -8,6 +6,42 @@
 <p>Current task record: {{ object.current_task_record }}</p>
 
 {% if object.current_task_record and not task.auto %}
-    <a class="govuk-button" href="{% url 'flow-continue' object.pk %}">Continue</a>
+<a class="govuk-button" href="{% url 'flow-continue' object.pk %}">Continue</a>
 {% endif %}
+
+<div id="cy" style="height: 600px; border"></div>
+{% endblock %} {% block script %}
+<script>
+  fetch("{% url 'flow-diagram' object.pk %}")
+    .then((response) => response.json())
+    .then((json) => {
+      const cy = Workflow.main.cytoscape({
+        container: document.getElementById("cy"),
+        elements: json.elements,
+        style: [
+          {
+            selector: "node",
+            style: {
+              "background-color": "#666",
+              label: "data(id)",
+            },
+          },
+          {
+            selector: "edge",
+            style: {
+              width: 3,
+              "line-color": "#ccc",
+              "target-arrow-color": "#ccc",
+              "target-arrow-shape": "triangle",
+              "curve-style": "bezier",
+            },
+          },
+        ],
+        layout: {
+          name: "cose",
+          componentSpacing: 80
+        },
+      });
+    });
+</script>
 {% endblock %}

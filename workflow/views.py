@@ -1,4 +1,5 @@
 from django.shortcuts import render, reverse, redirect
+from django.http import JsonResponse
 from django.views import View
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -66,3 +67,44 @@ class FlowContinueView(View):
         )
 
         return redirect(reverse("flow", args=[flow.pk]))
+
+
+class FlowDiagramView(View):
+    def get(self, request, pk, **kwargs):
+        flow = Flow.objects.get(pk=pk)
+
+        elements = workflow_to_cytoscape_elements(flow)
+
+        return JsonResponse({"elements": elements})
+
+
+def workflow_to_cytoscape_elements(flow):
+    nodes = map(step_to_node, flow.workflow.steps)
+
+    edges = []
+    for step in flow.workflow.steps:
+        targets = step.target if isinstance(step.target, list) else [step.target]
+        for target in targets:
+            if not target:
+                continue
+
+            edges.append(
+                {
+                    "data": {
+                        "id": f"{step.step_id}{target}",
+                        "source": step.step_id,
+                        "target": target,
+                    }
+                }
+            )
+
+    return [*nodes, *edges]
+
+
+def step_to_node(step):
+    return {
+        "data": {
+            "id": step.step_id,
+            "label": step.step_id,
+        }
+    }
