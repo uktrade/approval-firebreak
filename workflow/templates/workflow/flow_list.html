@@ -1,11 +1,13 @@
-{% extends 'workflow/base.html' %}
+{% extends 'base.html' %}
 
-{% block content %}
+{% block main_content %}
 <ul>
     {% for flow in object_list %}
-        <li>{{ flow.pk }} - {{ flow.workflow_name }} - {{ flow.is_complete }}</li>
+        <li><a href="{% url 'flow' flow.pk %}">{{ flow.pk }} - {{ flow.workflow_name }} - {{ flow.is_complete }}</a></li>
     {% empty %}
         <li>No flows</li>
     {% endfor %}
 </ul>
+
+<a class="govuk-button" href="{% url 'flow-create' %}">Create flow</a>
 {% endblock %}

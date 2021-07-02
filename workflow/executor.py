@@ -64,6 +64,8 @@ class WorkflowExecutor:
                 None,
             )
 
+            task_info = task_output
+
         self.flow.finished = timezone.now()
         self.flow.save()
 

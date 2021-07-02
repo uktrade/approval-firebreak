@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, reverse, redirect
 from django.utils import timezone
 from django.views import View
 from django.views.generic.edit import FormView, CreateView
@@ -40,6 +40,9 @@ class FlowCreateView(CreateView):
     model = Flow
     fields = ["workflow_name"]
 
+    def get_success_url(self):
+        return reverse("flow", args=[self.object.pk])
+
 
 class FlowStartView(View):
     def post(self, request, pk, **kwargs):
@@ -48,7 +51,7 @@ class FlowStartView(View):
         executor = WorkflowExecutor(flow)
         executor.run_flow(user=self.request.user)
 
-        return JsonResponse({"flow_id": flow.pk})
+        return redirect("flow", args=[flow.pk])
 
 
 class FlowProceedView(View):

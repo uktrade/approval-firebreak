@@ -5,6 +5,9 @@ from .task import Task
 
 class EmailForm(forms.Form):
     subject = forms.CharField()
+    message = forms.CharField(widget=forms.Textarea)
+    from_email = forms.EmailField()
+    recipient_list = forms.CharField()
 
 
 class EmailFormTask(Task, input="email_form"):
@@ -15,6 +18,6 @@ class EmailFormTask(Task, input="email_form"):
         form = self.form(data=kwargs)
 
         if not form.is_valid():
-            raise Exception
+            raise Exception(form.errors)
 
         return None, form.cleaned_data

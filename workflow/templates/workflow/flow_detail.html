@@ -1,25 +1,27 @@
-{% extends 'workflow/base.html' %}
+{% extends 'base.html' %}
 
-{% block content %}
+{% block main_content %}
 <h1>{{ object.workflow_name }}</h1>
 <p>Started: {{ object.started }}</p>
 <p>Finished: {{ object.finished }}</p>
 <p>Is complete: {{ object.is_complete }}</p>
 <p>Current task record: {{ object.current_task_record }}</p>
-<p>{{ step }}</p>
-<div>
-    {% if not task.auto and not object.is_complete %}
+
+{% if object.current_task_record and not task.auto %}
+    <div>
         <form action="proceed" method="POST">
             {% csrf_token %}
-            {{ form }}
+            {{ form.as_p }}
             <input type="hidden" name="uuid" value="{{ object.current_task_record.uuid }}">
             <button>Submit</button>
         </form>
-    {% endif %}
-</div>
+    </div>
+{% endif %}
 
-<form action="{% url 'flow-start' object.pk %}" method="POST">
-    {% csrf_token %}
-    <button>Start</button>
-</form>
+{% if not object.started %}
+    <form action="{% url 'flow-start' object.pk %}" method="POST">
+        {% csrf_token %}
+        <button class="govuk-button">Start</button>
+    </form>
+{% endif %}
 {% endblock %}
