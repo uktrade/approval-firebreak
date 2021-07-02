@@ -43,7 +43,7 @@ class WorkflowExecutor:
             task.setup(task_info)
 
             # the next task has a manual step
-            if not task.auto and not created:
+            if not task.auto and created:
                 return task_record
 
             target, task_output = task.execute(task_info)
