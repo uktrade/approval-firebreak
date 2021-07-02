@@ -4,7 +4,7 @@ from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
 
-import app_with_workflow.views as workflow_views
+import workflow.views as workflow_views
 
 
 urlpatterns = [

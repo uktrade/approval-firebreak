@@ -3,17 +3,21 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from app_with_workflow.workflow.example import ExampleWorkflow
+from app_with_workflow.workflow.approval_workflow import ApprovalWorkflow
+from workflow.workflows.example import ExampleWorkflow
 
 
+# TODO: make this more user friendly
 WORKFLOW_NAME_WORKFLOW = {
     "example_workflow": ExampleWorkflow,
+    "approval_workflow": ApprovalWorkflow,
 }
 
 
 class Flow(models.Model):
     WORKFLOWS = [
         ("example_workflow", "Example workflow"),
+        ("approval_workflow", "Approval workflow"),
     ]
 
     workflow_name = models.CharField(choices=WORKFLOWS, max_length=255)
