@@ -9,6 +9,13 @@
 - `make up`
 - `npm run dev`
 
+# Jupyter
+
+- `pip install jupyter`
+- `pip install ipycytoscape`
+- Launch Jupyter: `jupyter notebook`
+- Open `workflow.ipynb`
+
 # DEMO TODO
 
 List of users within system
