@@ -46,13 +46,13 @@ class FlowContinueView(View):
         context = {}
 
         step = flow.workflow.get_step(flow.current_task_record.step_id)
-        task = step.task
+        task = step.task(flow.current_task_record, flow)
         context["step"] = step
         context["task"] = task
         context["flow"] = flow
 
         if not task.auto:
-            context["form"] = task.form()
+            context["form"] = task.context()
 
         return render(request, "workflow/flow-continue.html", context=context)
 

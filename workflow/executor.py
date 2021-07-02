@@ -49,8 +49,6 @@ class WorkflowExecutor:
             target, task_output = task.execute(task_info)
 
             # TODO: check target against step target
-            # TODO: do something with task output
-            # TODO: do we want to pass task output to next task
 
             task_record.finished_at = timezone.now()
             task_record.save()
