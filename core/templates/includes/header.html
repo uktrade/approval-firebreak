@@ -21,14 +21,16 @@
             <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation"
                     aria-label="Show or hide navigation menu">Menu
             </button>
-            {% comment %}
             <nav>
                 <ul id="navigation" class="govuk-header__navigation " aria-label="Navigation menu">
-                    <li class="govuk-header__navigation-item {% if request.path == "/new-requirement/" %}govuk-header__navigation-item--active{% endif %}">
-                        <a class="govuk-header__link" href="{% url "new_requirement" %}">
-                            New requirement
+                    <li class="govuk-header__navigation-item">
+                        <a class="govuk-header__link" href="{% url "flow-list" %}">
+                            Flows
                         </a>
                     </li>
+                </ul>
+            </nav>
+            {% comment %}
                     <li class="govuk-header__navigation-item {% if request.path in "/" %}govuk-header__navigation-item--active{% endif %}">
                         <a class="govuk-header__link" href="{% url "requirements" %}">
                             My requirements

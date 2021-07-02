@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "workflow",
-    "app_with_workflow",
+    "recruitment_approval",
 ]
 
 MIDDLEWARE = [

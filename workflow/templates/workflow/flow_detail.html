@@ -10,11 +10,4 @@
 {% if object.current_task_record and not task.auto %}
     <a class="govuk-button" href="{% url 'flow-continue' object.pk %}">Continue</a>
 {% endif %}
-
-{% if not object.started %}
-    <form action="{% url 'flow-start' object.pk %}" method="POST">
-        {% csrf_token %}
-        <button class="govuk-button">Start</button>
-    </form>
-{% endif %}
 {% endblock %}

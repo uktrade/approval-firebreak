@@ -3,7 +3,7 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from app_with_workflow.workflow.approval_workflow import ApprovalWorkflow
+from recruitment_approval.workflow.approval_workflow import ApprovalWorkflow
 from workflow.workflows.example import ExampleWorkflow
 
 
@@ -17,10 +17,12 @@ WORKFLOW_NAME_WORKFLOW = {
 class Flow(models.Model):
     WORKFLOWS = [
         ("example_workflow", "Example workflow"),
-        ("approval_workflow", "Approval workflow"),
+        ("approval_workflow", "Candidate approval process"),
     ]
 
-    workflow_name = models.CharField(choices=WORKFLOWS, max_length=255)
+    workflow_name = models.CharField(
+        "Begin workflow", choices=WORKFLOWS, max_length=255
+    )
     started = models.DateTimeField(null=True)
     finished = models.DateTimeField(null=True, blank=True)
 

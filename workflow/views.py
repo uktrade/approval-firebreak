@@ -24,15 +24,13 @@ class FlowCreateView(CreateView):
     def get_success_url(self):
         return reverse("flow", args=[self.object.pk])
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
 
-class FlowStartView(View):
-    def post(self, request, pk, **kwargs):
-        flow = Flow.objects.get(pk=pk)
-
-        executor = WorkflowExecutor(flow)
+        executor = WorkflowExecutor(self.object)
         executor.run_flow(user=self.request.user)
 
-        return redirect(reverse("flow", args=[flow.pk]))
+        return response
 
 
 class FlowContinueView(View):
