@@ -59,7 +59,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = ["core", "user", "workflow", "chartofaccount"]
+LOCAL_APPS = ["core", "user", "workflow", "chartofaccount", "recruitment_approval"]
 
 THIRD_PARTY_APPS = [
     "authbroker_client",

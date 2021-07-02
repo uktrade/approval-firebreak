@@ -35,15 +35,15 @@ class WorkflowExecutor:
                 task_name=current_step.task_name,
                 step_id=current_step.step_id,
                 executed_by=None,
-                defaults={"task_info": current_step.task_info},
+                defaults={"task_info": current_step.task_info or {}},
             )
 
-            task = current_step.task(task_record, self.flow)
+            task = current_step.task(user, task_record, self.flow)
 
             task.setup(task_info)
 
             # the next task has a manual step
-            if not task.auto and created:
+            if not task.auto and not created:
                 return task_record
 
             target, task_output = task.execute(task_info)
@@ -52,6 +52,7 @@ class WorkflowExecutor:
 
             task_record.finished_at = timezone.now()
             task_record.save()
+            self.flow.save()
 
             current_step = next(
                 (

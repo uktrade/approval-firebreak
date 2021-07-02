@@ -30,6 +30,7 @@ class Flow(models.Model):
     )
     started = models.DateTimeField(null=True)
     finished = models.DateTimeField(null=True, blank=True)
+    flow_info = models.JSONField(default=dict)
 
     @property
     def is_complete(self):
@@ -83,7 +84,7 @@ class TaskRecord(models.Model):
         blank=True,
         null=True,
     )
-    task_info = models.JSONField(null=True, blank=True)
+    task_info = models.JSONField(default=dict)
 
     def __str__(self):
         return f"{self.step_id} {self.task_name}"

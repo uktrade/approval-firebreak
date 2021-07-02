@@ -44,15 +44,17 @@ class FlowContinueView(View):
         context = {}
 
         step = flow.workflow.get_step(flow.current_task_record.step_id)
-        task = step.task(flow.current_task_record, flow)
+        task = step.task(self.request.user, flow.current_task_record, flow)
         context["step"] = step
         context["task"] = task
         context["flow"] = flow
 
         if not task.auto:
-            context["form"] = task.context()
+            context |= task.context()
 
-        return render(request, "workflow/flow-continue.html", context=context)
+        template = task.template or "workflow/flow-continue.html"
+
+        return render(request, template, context=context)
 
     def post(self, request, pk, **kwargs):
         flow = Flow.objects.get(pk=pk)

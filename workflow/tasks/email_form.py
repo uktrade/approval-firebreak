@@ -16,6 +16,7 @@ class EmailFormTask(Task, input="email_form"):
 
     def execute(self, task_info):
         form = self.form(task_info)
+
         if not form.is_valid():
             raise Exception(form.errors)
 
@@ -26,4 +27,4 @@ class EmailFormTask(Task, input="email_form"):
         return None, form.cleaned_data
 
     def context(self):
-        return self.form(initial=self.task_record.task_info)
+        return {"form": self.form(initial=self.task_record.task_info)}

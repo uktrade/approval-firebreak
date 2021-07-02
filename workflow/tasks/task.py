@@ -1,7 +1,9 @@
 class Task:
     tasks = {}
+    template = None
 
-    def __init__(self, task_record, flow):
+    def __init__(self, user, task_record, flow):
+        self.user = user
         self.task_record = task_record
         self.flow = flow
 
