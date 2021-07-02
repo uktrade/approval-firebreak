@@ -27,12 +27,12 @@ VCAP_SERVICES = env.json("VCAP_SERVICES", {})
 # Set required configuration from environment
 APP_ENV = env.str("APP_ENV", "local")
 
-# Staff SSO
+#  Staff SSO
 AUTHBROKER_URL = env("AUTHBROKER_URL")
 AUTHBROKER_CLIENT_ID = env("AUTHBROKER_CLIENT_ID")
 AUTHBROKER_CLIENT_SECRET = env("AUTHBROKER_CLIENT_SECRET")
-LOGIN_URL = reverse_lazy('authbroker_client:login')
-LOGIN_REDIRECT_URL = reverse_lazy('test')
+LOGIN_URL = reverse_lazy("authbroker_client:login")
+LOGIN_REDIRECT_URL = reverse_lazy("test")
 
 AUTH_USER_MODEL = "user.User"
 
@@ -51,20 +51,15 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 DJANGO_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = [
-    "core",
-    "user",
-    "workflow",
-    "chartofaccount"
-]
+LOCAL_APPS = ["core", "user", "workflow", "chartofaccount"]
 
 THIRD_PARTY_APPS = [
     "authbroker_client",
@@ -76,36 +71,36 @@ THIRD_PARTY_APPS = [
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #"authbroker_client.middleware.ProtectAllViewsMiddleware",
-    'simple_history.middleware.HistoryRequestMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # "authbroker_client.middleware.ProtectAllViewsMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -122,16 +117,16 @@ DATABASES = {"default": env.db()}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -139,9 +134,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-gb'
+LANGUAGE_CODE = "en-gb"
 
-TIME_ZONE = 'Europe/London'
+TIME_ZONE = "Europe/London"
 
 USE_I18N = True
 
@@ -153,21 +148,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Django webpack loader config
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'assets'),
-)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "assets"),)
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    #"user.backends.CustomAuthbrokerBackend",
+    "django.contrib.auth.backends.ModelBackend",
+    # "user.backends.CustomAuthbrokerBackend",
 ]
 
 # Application paths outside of SSO protection
@@ -191,5 +184,7 @@ GOVUK_NOTIFY_API_KEY = env("GOVUK_NOTIFY_API_KEY")
 # Notify templates
 HIRING_MANAGER_NEW_REQUEST_TEMPLATE_ID = env("HIRING_MANAGER_NEW_REQUEST_TEMPLATE_ID")
 CHIEF_APPROVAL_REQUEST_TEMPLATE_ID = env("CHIEF_APPROVAL_REQUEST_TEMPLATE_ID")
-HIRING_MANAGER_CHANGES_REQUESTED_TEMPLATE_ID = env("HIRING_MANAGER_CHANGES_REQUESTED_TEMPLATE_ID")
+HIRING_MANAGER_CHANGES_REQUESTED_TEMPLATE_ID = env(
+    "HIRING_MANAGER_CHANGES_REQUESTED_TEMPLATE_ID"
+)
 BUS_OPS_APPROVAL_REQUEST_TEMPLATE_ID = env("BUS_OPS_APPROVAL_REQUEST_TEMPLATE_ID")

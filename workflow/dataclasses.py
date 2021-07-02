@@ -23,7 +23,7 @@ class Workflow:
     steps: list[Step]
 
     def get_step(self, step_id):
-        return next(step for step in self.steps if step.step_id == step_id)
+        return next((step for step in self.steps if step.step_id == step_id), None)
 
     @property
     def first_step(self):

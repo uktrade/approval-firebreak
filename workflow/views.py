@@ -11,6 +11,7 @@ from workflow.models import Flow
 class FlowListView(ListView):
     model = Flow
     paginate_by = 100  # if pagination is desired
+    ordering = "-started"
 
 
 class FlowView(DetailView):
@@ -19,12 +20,15 @@ class FlowView(DetailView):
 
 class FlowCreateView(CreateView):
     model = Flow
-    fields = ["workflow_name"]
+    fields = ["workflow_name", "flow_name"]
 
     def get_success_url(self):
         return reverse("flow", args=[self.object.pk])
 
     def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.executed_by = self.request.user
+
         response = super().form_valid(form)
 
         executor = WorkflowExecutor(self.object)

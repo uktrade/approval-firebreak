@@ -23,6 +23,11 @@ class Flow(models.Model):
     workflow_name = models.CharField(
         "Begin workflow", choices=WORKFLOWS, max_length=255
     )
+    flow_name = models.CharField("Process", max_length=255)
+    executed_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+    )
     started = models.DateTimeField(null=True)
     finished = models.DateTimeField(null=True, blank=True)
 
@@ -37,6 +42,27 @@ class Flow(models.Model):
     @property
     def current_task_record(self):
         return self.tasks.filter(finished_at__isnull=True).first()
+
+    @property
+    def nice_name(self):
+        if self.is_complete:
+            return "Completed"
+        elif self.started:
+            return "In-progress"
+        else:
+            return "Not started"
+
+    @property
+    def on_manual_step(self):
+        if not self.current_task_record:
+            return False
+
+        current_step = self.workflow.get_step(self.current_task_record.step_id)
+
+        if not current_step:
+            return False
+
+        return not self.workflow.get_step(self.current_task_record.step_id).task.auto
 
 
 class TaskRecord(models.Model):

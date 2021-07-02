@@ -1,11 +1,23 @@
 {% extends 'base.html' %}
 
 {% block main_content %}
-<ul>
+<h1 class="govuk-heading-l">Candidates requiring approval</h1>
+<a class="govuk-button" href="{% url 'flow-create' %}">Create flow</a>
+<ul class="govuk-list">
     {% for flow in object_list %}
-        <li><a href="{% url 'flow' flow.pk %}">{{ flow.pk }} - {{ flow.workflow_name }} - {{ flow.is_complete }}</a></li>
+        <li>
+            {% include "includes/requirement_summary.html" with requirement=flow %}
+            <p>
+                {% if flow.on_manual_step %}
+                    <a class="govuk-button" data-module="govuk-button" href="{% url "flow-continue" flow.pk %}">Progress requirement</a>
+                {% else %}
+                    <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="{% url "flow" flow.pk %}">View requirement</a>
+                {% endif %}
+            </p>
+        </li>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
     {% empty %}
-        <li>No flows</li>
+        <li><p class="govuk-body">No requirements yet.</p></li>
     {% endfor %}
 </ul>
 
