@@ -2,7 +2,12 @@
 
 1. `cp .env.example .env`
 2. `make build`
-3. `make up`
+3. `npm install`
+
+# Running
+
+- `make up`
+- `npm run dev`
 
 # DEMO TODO
 
