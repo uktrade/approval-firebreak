@@ -40,13 +40,13 @@ class WorkflowExecutor:
 
             task = current_step.task(task_record, self.flow)
 
-            task.setup(**task_info)
+            task.setup(task_info)
 
             # the next task has a manual step
             if not task.auto and created:
                 return task_record
 
-            target, task_output = task.execute(**task_info)
+            target, task_output = task.execute(task_info)
 
             # TODO: check target against step target
             # TODO: do something with task output

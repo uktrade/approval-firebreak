@@ -5,10 +5,10 @@ class Task:
         self.task_record = task_record
         self.flow = flow
 
-    def setup(self, **kwargs):
+    def setup(self, task_info):
         pass
 
-    def execute(self, **kwargs):
+    def execute(self, task_info):
         raise NotImplementedError
 
     def log(self, message):

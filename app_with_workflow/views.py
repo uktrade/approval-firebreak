@@ -20,21 +20,6 @@ class FlowListView(ListView):
 class FlowView(DetailView):
     model = Flow
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        flow = self.get_object()
-        if flow.current_task_record:
-            step = flow.workflow.get_step(flow.current_task_record.step_id)
-            task = step.task
-            context["step"] = step
-            context["task"] = task
-
-            if not task.auto:
-                context["form"] = task.form()
-
-        return context
-
 
 class FlowCreateView(CreateView):
     model = Flow
@@ -51,10 +36,26 @@ class FlowStartView(View):
         executor = WorkflowExecutor(flow)
         executor.run_flow(user=self.request.user)
 
-        return redirect("flow", args=[flow.pk])
+        return redirect(reverse("flow", args=[flow.pk]))
 
 
-class FlowProceedView(View):
+class FlowContinueView(View):
+    def get(self, request, pk, **kwargs):
+        flow = Flow.objects.get(pk=pk)
+
+        context = {}
+
+        step = flow.workflow.get_step(flow.current_task_record.step_id)
+        task = step.task
+        context["step"] = step
+        context["task"] = task
+        context["flow"] = flow
+
+        if not task.auto:
+            context["form"] = task.form()
+
+        return render(request, "workflow/flow-continue.html", context=context)
+
     def post(self, request, pk, **kwargs):
         flow = Flow.objects.get(pk=pk)
 
@@ -64,7 +65,7 @@ class FlowProceedView(View):
             user=self.request.user, task_info=self.request.POST, task_uuid=task_uuid
         )
 
-        return JsonResponse({"flow_id": flow.pk})
+        return redirect(reverse("flow", args=[flow.pk]))
 
 
 # Starts process

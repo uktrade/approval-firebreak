@@ -14,10 +14,13 @@ class EmailFormTask(Task, input="email_form"):
     auto = False
     form = EmailForm
 
-    def execute(self, **kwargs):
-        form = self.form(data=kwargs)
-
+    def execute(self, task_info):
+        form = self.form(task_info)
         if not form.is_valid():
             raise Exception(form.errors)
+
+        form.cleaned_data["recipient_list"] = form.cleaned_data["recipient_list"].split(
+            ","
+        )
 
         return None, form.cleaned_data

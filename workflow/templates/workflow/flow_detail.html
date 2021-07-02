@@ -8,14 +8,7 @@
 <p>Current task record: {{ object.current_task_record }}</p>
 
 {% if object.current_task_record and not task.auto %}
-    <div>
-        <form action="proceed" method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="hidden" name="uuid" value="{{ object.current_task_record.uuid }}">
-            <button>Submit</button>
-        </form>
-    </div>
+    <a class="govuk-button" href="{% url 'flow-continue' object.pk %}">Continue</a>
 {% endif %}
 
 {% if not object.started %}
