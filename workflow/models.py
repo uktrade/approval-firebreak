@@ -1,5 +1,6 @@
 import uuid
 
+from django.shortcuts import reverse
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -65,6 +66,11 @@ class Flow(models.Model):
             return False
 
         return not self.workflow.get_step(self.current_task_record.step_id).task.auto
+
+    @property
+    def continue_url(self):
+        # TODO: move hardcoded domain to settings
+        return "http://localhost:8000" + reverse("flow-continue", args=[self.pk])
 
 
 class TaskRecord(models.Model):

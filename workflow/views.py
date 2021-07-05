@@ -42,6 +42,9 @@ class FlowContinueView(View):
     def get(self, request, pk, **kwargs):
         flow = Flow.objects.get(pk=pk)
 
+        if not flow.current_task_record:
+            return redirect(reverse("flow-list"))
+
         context = {}
 
         step = flow.workflow.get_step(flow.current_task_record.step_id)

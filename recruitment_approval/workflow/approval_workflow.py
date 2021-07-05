@@ -28,9 +28,8 @@ ApprovalWorkflow = Workflow(
             target="hiring_manager_approval",
             task_info={
                 "subject": "Hiring manager approval required",
-                "message": "TODO: add template context",
+                "message": "You can view the requirement at {{ requirement_url }} and continue it at {{ flow.continue_url }}",
                 "from_email": "system@example.com",
-                # TODO: support template and template context
             },
         ),
         Step(
@@ -50,7 +49,7 @@ ApprovalWorkflow = Workflow(
             target=None,
             task_info={
                 "subject": "Hiring approved",
-                "message": "TODO: add template context",
+                "message": "You can view the requirement at {{ requirement_url }} and continue it at {{ flow.continue_url }}",
                 "from_email": "system@example.com",
             },
         ),
@@ -66,7 +65,7 @@ ApprovalWorkflow = Workflow(
             target="review_requirement",
             task_info={
                 "subject": "Hiring rejected",
-                "message": "TODO: add template context",
+                "message": "You can view the requirement at {{ requirement_url }} and continue it at {{ flow.continue_url }}",
                 "from_email": "system@example.com",
             },
         ),
