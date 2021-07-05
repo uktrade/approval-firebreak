@@ -9,7 +9,7 @@
 <a class="govuk-button" href="{% url 'flow-continue' object.pk %}">Continue</a>
 {% endif %}
 
-<div id="cy" style="height: 600px; border"></div>
+<div id="cy" style="height: 2000px; border"></div>
 {% endblock %} {% block script %}
 <script>
   fetch("{% url 'flow-diagram' object.pk %}")
@@ -18,11 +18,17 @@
       const cy = Workflow.main.cytoscape({
         container: document.getElementById("cy"),
         elements: json.elements,
+        userZoomingEnabled: false,
         style: [
           {
             selector: "node",
             style: {
               "background-color": "#666",
+              shape: 'roundrectangle',
+              width: '200px',
+              height: '60px',
+              'text-valign': 'center',
+              'text-halign': 'center',
               label: "data(id)",
             },
           },
@@ -36,10 +42,33 @@
               "curve-style": "bezier",
             },
           },
+          {
+            selector: "node[?start]",
+            style: {
+              "background-color": "blue",
+            },
+          },
+          {
+            selector: "node[?end]",
+            style: {
+              "background-color": "blue",
+            },
+          },
+          {
+            selector: "node[?decision]",
+            style: {
+              "background-color": "green",
+            },
+          }
         ],
         layout: {
-          name: "cose",
-          componentSpacing: 80
+          name: 'breadthfirst',
+          directed: true,
+          // roots: ["create_requirement"],
+          // fit: false,
+          spacingFactor: 1,
+          padding: 0,
+          // nodeDimensionsIncludeLabels: true,
         },
       });
     });

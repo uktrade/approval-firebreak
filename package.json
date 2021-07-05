@@ -7,11 +7,11 @@
   "dependencies": {
     "css-loader": "^5.2.6",
     "cytoscape": "^3.19.0",
-    "cytoscape-dagre": "^2.3.2",
     "govuk-frontend": "^3.12.0",
     "mini-css-extract-plugin": "^1.6.0",
     "sass": "^1.34.1",
-    "sass-loader": "^12.1.0"
+    "sass-loader": "^12.1.0",
+    "web-worker": "^1.0.0"
   },
   "scripts": {
     "dev": "webpack --config webpack.config.js --watch --mode=development",

@@ -73,7 +73,7 @@ ApprovalWorkflow = Workflow(
         Step(
             step_id="review_requirement",
             task_name="review_requirement",
-            target=["hiring_manager_approval", None],
+            target="hiring_manager_approval",
         ),
     ],
 )

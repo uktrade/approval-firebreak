@@ -14,7 +14,7 @@ sentry-sdk>=0.20.2
 celery
 
 # Front end
-django-webpack-loader
+django-webpack-loader==1.0.0
 
 # DB
 psycogreen

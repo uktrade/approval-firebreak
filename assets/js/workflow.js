@@ -1,6 +1,6 @@
 import cytoscape from "cytoscape";
-import dagre from "cytoscape-dagre";
+import elk from "cytoscape-elk";
 
-cytoscape.use(dagre);
+cytoscape.use(elk);
 
 export { cytoscape };

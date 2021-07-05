@@ -102,9 +102,17 @@ def workflow_to_cytoscape_elements(flow):
 
 
 def step_to_node(step):
+    targets = []
+
+    if step.target:
+        targets = step.target if isinstance(step.target, list) else [step.target]
+
     return {
         "data": {
             "id": step.step_id,
             "label": step.step_id,
+            "start": step.start,
+            "end": not bool(targets),
+            "decision": len(targets) > 1,
         }
     }
