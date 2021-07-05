@@ -88,7 +88,7 @@ class ReviewRequirement(Task, input="review_requirement"):
         else:
             raise TaskError("Form is not valid", {"form": form})
 
-        return "hiring_manager_approval", form.cleaned_data
+        return None, form.cleaned_data
 
     def context(self):
         requirement = Requirement.objects.get(pk=self.flow.flow_info["requirement_id"])
