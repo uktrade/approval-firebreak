@@ -2,11 +2,14 @@ x cyclic support
 x show progress on graph
 x nice names on nodes
 x nice name for workflow
-- format workflow details
 - template support
-- ux fixes for user journey
+- format workflow details
 - form validation
 - gds forms
 - improve approval form
+- ux fixes for user journey
+
+NICE TO HAVE
+============
 - interactive graph nodes
     - hover over for task details
