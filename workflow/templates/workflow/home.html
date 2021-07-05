@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Approval Workflow</title>
+</head>
+<body>
+
+</body>
+</html>
+{% extends 'base.html' %}
+
+{% block main_content %}
+    <h1 class="govuk-heading-xl">DDaT Approval Workflow</h1>
+    <div class="app-prose-scope">
+        <p class="govuk-body">
+            The Approval Workflow service enables you to select an approval workflow and follow a process to
+            complete a predefined task. The service provides a graphical representation of the workflow and its
+            current status.
+        </p>
+    </div>
+
+    <h1 class="govuk-heading-m">Building your own workflow</h1>
+    <div class="app-prose-scope">
+        <p class="govuk-body">
+            Tasks are easily defined and customised. You can either extend this service or build your own service
+            and quickly leverage the capabilities of the Workflow executor. There are some built-in views and task
+            types and you can create your own if required.
+        </p>
+    </div>
+
+    <div class="app-prose-scope">
+        <p class="govuk-body">
+            Get started by clicking 'Carry out task' below...
+        </p>
+    </div>
+
+    <a class="govuk-button" href="{% url 'flow-create' %}">Carry out a task</a>
+{% endblock %}
