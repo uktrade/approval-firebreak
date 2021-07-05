@@ -3,7 +3,7 @@
 {% block main_content %}
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input class="govuk-button" type="submit" value="Start">
+    {% include 'includes/govt_uk_form.html' %}
+    <button class="govuk-button">Start</button>
 </form>
 {% endblock %}

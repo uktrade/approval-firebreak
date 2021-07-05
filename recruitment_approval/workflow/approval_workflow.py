@@ -72,7 +72,24 @@ ApprovalWorkflow = Workflow(
         Step(
             step_id="review_requirement",
             task_name="review_requirement",
+            # target="hiring_manager_approval",
+            target="find_hiring_managers",
+        ),
+        Step(
+            step_id="find_hiring_managers",
+            task_name="find_approver_recipients",
+            target="notifiy_requirement_reviewed",
+            task_info={"group_name": "Hiring Managers"},
+        ),
+        Step(
+            step_id="notifiy_requirement_reviewed",
+            task_name="send_email",
             target="hiring_manager_approval",
+            task_info={
+                "subject": "Requirement reviewed",
+                "message": "I have reviewed the requirement at {{ requirement_url }} please check it over at {{ flow.continue_url }}",
+                "from_email": "system@example.com",
+            },
         ),
     ],
 )

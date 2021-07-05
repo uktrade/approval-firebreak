@@ -22,9 +22,13 @@ class Flow(models.Model):
     ]
 
     workflow_name = models.CharField(
-        "Begin workflow", choices=WORKFLOWS, max_length=255
+        "Select workflow", choices=WORKFLOWS, max_length=255
     )
-    flow_name = models.CharField("Process", max_length=255)
+    flow_name = models.CharField(
+        "What task do you need to carry out?",
+        max_length=255,
+        help_text="e.g. Hire a Python Developer",
+    )
     executed_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,

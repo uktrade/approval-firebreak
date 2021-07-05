@@ -1,8 +1,31 @@
 {% extends 'base.html' %} {% block main_content %}
-<h1>{{ object.get_workflow_name_display }} - {{ object.flow_name }}</h1>
-<p>Started: {{ object.started }}</p>
-<p>Finished: {{ object.finished }}</p>
-<p>Status: {{ object.nice_name }}</p>
+<h1 class="govuk-heading-l">{{ object.get_workflow_name_display }} - {{ object.flow_name }}</h1>
+<dl class="govuk-summary-list">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Started
+    </dt>
+    <dd class="govuk-summary-list__value">
+      {{ object.started }}
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Finished
+    </dt>
+    <dd class="govuk-summary-list__value">
+      {{ object.finished }}
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Status
+    </dt>
+    <dd class="govuk-summary-list__value">
+      {{ object.nice_name }}
+    </dd>
+  </div>
+</dl>
 
 {% if object.current_task_record and not task.auto %}
 <a class="govuk-button" href="{% url 'flow-continue' object.pk %}">Continue</a>
@@ -27,7 +50,7 @@
               "border-style": "solid",
               "border-color": "black",
               shape: 'roundrectangle',
-              width: '200px',
+              width: '220px',
               height: '60px',
               'text-valign': 'center',
               'text-halign': 'center',
@@ -81,8 +104,8 @@
         ],
         layout: {
           name: 'breadthfirst',
-          directed: true,
-          // roots: ["create_requirement"],
+          // directed: true,
+          roots: ["create_requirement"],
           // fit: false,
           spacingFactor: 1,
           padding: 0,

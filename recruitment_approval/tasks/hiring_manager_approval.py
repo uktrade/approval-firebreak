@@ -1,16 +1,19 @@
 from django import forms
 
 from recruitment_approval.models import Requirement
-from workflow.tasks import Task
+from workflow.forms import GovFormattedForm
+from workflow.tasks import Task, TaskError
 
 
-class HiringManagerApprovalForm(forms.Form):
+class HiringManagerApprovalForm(GovFormattedForm):
     approved = forms.BooleanField(
         required=False,
         label="I approve this requirement",
         widget=forms.CheckboxInput(),
     )
-    rejection_reason = forms.CharField(widget=forms.Textarea)
+    rejection_reason = forms.CharField(widget=forms.Textarea, required=False)
+
+    # TODO: custom validation or 2 forms
 
 
 class HiringManagerApproval(Task, input="hiring_manager_approval"):
@@ -23,7 +26,7 @@ class HiringManagerApproval(Task, input="hiring_manager_approval"):
 
         if not form.is_valid():
             # TODO: how to display form with errors
-            raise Exception(form.errors)
+            raise TaskError("Form is not valid", {"form": form})
 
         target = (
             "hiring_approved" if form.cleaned_data["approved"] else "hiring_rejected"

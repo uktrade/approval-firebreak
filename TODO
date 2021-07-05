@@ -3,11 +3,13 @@ x show progress on graph
 x nice names on nodes
 x nice name for workflow
 x template support
-- form validation
-- format workflow details
-- gds forms
-- improve approval form
+x form validation
+x format workflow details
+x gds forms
+x improve approval form
 - ux fixes for user journey
+- split approval to 2 forms (Ross)
+- switch to file emails
 
 NICE TO HAVE
 ============

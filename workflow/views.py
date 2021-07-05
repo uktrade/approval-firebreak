@@ -5,6 +5,8 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
+from workflow.forms import GovFormattedModelForm
+from workflow.tasks import TaskError
 from workflow.executor import WorkflowExecutor
 from workflow.models import Flow
 
@@ -19,9 +21,15 @@ class FlowView(DetailView):
     model = Flow
 
 
+class FlowCreateForm(GovFormattedModelForm):
+    class Meta:
+        model = Flow
+        fields = ["flow_name", "workflow_name"]
+
+
 class FlowCreateView(CreateView):
     model = Flow
-    fields = ["workflow_name", "flow_name"]
+    form_class = FlowCreateForm
 
     def get_success_url(self):
         return reverse("flow", args=[self.object.pk])
@@ -39,37 +47,60 @@ class FlowCreateView(CreateView):
 
 
 class FlowContinueView(View):
-    def get(self, request, pk, **kwargs):
-        flow = Flow.objects.get(pk=pk)
+    def setup(self, request, pk, **kwargs):
+        super().setup(request, pk, **kwargs)
 
-        if not flow.current_task_record:
+        self.flow = Flow.objects.get(pk=pk)
+
+        self.step = None
+        self.task = None
+
+        if self.flow.current_task_record:
+            self.step = self.flow.workflow.get_step(
+                self.flow.current_task_record.step_id
+            )
+            self.task = self.step.task(
+                request.user, self.flow.current_task_record, self.flow
+            )
+
+    def get(self, request, pk, **kwargs):
+        if not self.task:
             return redirect(reverse("flow-list"))
 
-        context = {}
+        context = self.get_context_data()
 
-        step = flow.workflow.get_step(flow.current_task_record.step_id)
-        task = step.task(self.request.user, flow.current_task_record, flow)
-        context["step"] = step
-        context["task"] = task
-        context["flow"] = flow
-
-        if not task.auto:
-            context |= task.context()
-
-        template = task.template or "workflow/flow-continue.html"
+        template = self.task.template or "workflow/flow-continue.html"
 
         return render(request, template, context=context)
 
     def post(self, request, pk, **kwargs):
-        flow = Flow.objects.get(pk=pk)
-
         task_uuid = self.request.POST["uuid"]
-        executor = WorkflowExecutor(flow)
-        executor.run_flow(
-            user=self.request.user, task_info=self.request.POST, task_uuid=task_uuid
-        )
+        executor = WorkflowExecutor(self.flow)
 
-        return redirect(reverse("flow", args=[flow.pk]))
+        try:
+            executor.run_flow(
+                user=self.request.user, task_info=self.request.POST, task_uuid=task_uuid
+            )
+        except TaskError as error:
+            template = self.task.template or "workflow/flow-continue.html"
+
+            context = self.get_context_data() | error.context
+
+            return render(request, template, context=context)
+
+        return redirect(reverse("flow", args=[self.flow.pk]))
+
+    def get_context_data(self, **kwargs):
+        context = {}
+
+        context["flow"] = self.flow
+        context["step"] = self.step
+        context["task"] = self.task
+
+        if not self.task.auto:
+            context |= self.task.context()
+
+        return context
 
 
 class FlowDiagramView(View):

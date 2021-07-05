@@ -2,11 +2,11 @@
 
 {% block main_content %}
 <div>
-    <form method="POST">
+    <form novalidate method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% include 'includes/govt_uk_form.html' %}
         <input type="hidden" name="uuid" value="{{ flow.current_task_record.uuid }}">
-        <button>Submit</button>
+        <button class="govuk-button">Submit</button>
     </form>
 </div>
 {% endblock %}

@@ -20,6 +20,11 @@
         <label class="govuk-label" for="{{ field.name }}">
             {{ field.label }}{% if field.field.required == False %} (optional){% endif %}
         </label>
+        {% if field.help_text %}
+            <div class="govuk-hint">
+                {{ field.help_text }}
+            </div>
+        {% endif %}
     {% endif %}
         {% if field.errors %}
             {% for error in field.errors %}
@@ -36,6 +41,11 @@
                 <label class="govuk-label govuk-checkboxes__label" for="{{ field.name }}">
                 {{ field.label }}{% if field.field.required == False %} (optional){% endif %}
                 </label>
+                {% if field.help_text %}
+                    <div class="govuk-hint">
+                        {{ field.help_text }}
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% else %}

@@ -1,31 +1,9 @@
-from django import forms
-from django.forms.widgets import (
-    Textarea,
-    Select,
-    CheckboxInput,
-    TextInput,
-    DateInput,
-    EmailInput,
-)
+from django.forms.widgets import DateInput
 
 from recruitment_approval.models import Requirement
 
-from workflow.tasks import Task
-
-
-class GovFormattedModelForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(forms.ModelForm, self).__init__(*args, **kwargs)
-        for field in self.fields.items():
-            widget = field[1].widget
-            if isinstance(widget, Textarea):
-                widget.attrs.update({"class": "govuk-textarea"})
-            elif isinstance(widget, Select):
-                widget.attrs.update({"class": "govuk-select"})
-            elif isinstance(widget, CheckboxInput):
-                widget.attrs.update({"class": "govuk-checkboxes__input"})
-            elif isinstance(widget, TextInput) or isinstance(widget, EmailInput):
-                widget.attrs.update({"class": "govuk-input"})
+from workflow.forms import GovFormattedModelForm
+from workflow.tasks import Task, TaskError
 
 
 class NewRequirementForm(GovFormattedModelForm):
@@ -77,15 +55,15 @@ class NewRequirementForm(GovFormattedModelForm):
 
 class CreateRequirement(Task, input="create_requirement"):
     auto = False
-    form = NewRequirementForm
+    form_class = NewRequirementForm
 
     def execute(self, task_info):
-        form = self.form(task_info, hiring_manager=self.user)
+        form = self.form_class(task_info, hiring_manager=self.user)
 
         if form.is_valid():
             form.save()
         else:
-            raise Exception(form.errors)
+            raise TaskError("Form is not valid", {"form": form})
 
         self.flow.flow_info["requirement_id"] = str(form.instance.pk)
         self.flow.flow_info["requirement_url"] = "https://www.google.com"
@@ -93,26 +71,26 @@ class CreateRequirement(Task, input="create_requirement"):
         return None, form.cleaned_data
 
     def context(self):
-        return {"form": self.form(initial=self.task_record.task_info)}
+        return {"form": self.form_class(initial=self.task_record.task_info)}
 
 
 class ReviewRequirement(Task, input="review_requirement"):
     auto = False
-    form = NewRequirementForm
+    form_class = NewRequirementForm
 
     def execute(self, task_info):
         requirement = Requirement.objects.get(pk=self.flow.flow_info["requirement_id"])
 
-        form = self.form(instance=requirement, data=task_info)
+        form = self.form_class(instance=requirement, data=task_info)
 
         if form.is_valid():
             form.save()
         else:
-            raise Exception(form.errors)
+            raise TaskError("Form is not valid", {"form": form})
 
         return "hiring_manager_approval", form.cleaned_data
 
     def context(self):
         requirement = Requirement.objects.get(pk=self.flow.flow_info["requirement_id"])
 
-        return {"form": self.form(instance=requirement)}
+        return {"form": self.form_class(instance=requirement)}
