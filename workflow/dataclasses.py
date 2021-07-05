@@ -11,6 +11,7 @@ class Step:
     target: Optional[str]
     start: Optional[bool] = None
     task_info: Optional[dict] = None
+    description: Optional[str] = None
 
     @property
     def task(self):

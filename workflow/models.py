@@ -44,6 +44,7 @@ class Flow(models.Model):
     def current_task_record(self):
         return self.tasks.filter(finished_at__isnull=True).first()
 
+    # TODO: rename
     @property
     def nice_name(self):
         if self.is_complete:

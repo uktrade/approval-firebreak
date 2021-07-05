@@ -114,7 +114,7 @@ def step_to_node(flow, step):
     end = not bool(targets)
     done = latest_step_task and bool(latest_step_task.finished_at)
 
-    label = step.step_id
+    label = step.description or format_step_id(step.step_id)
     if end and done:
         label += " ✓"
 
@@ -129,3 +129,8 @@ def step_to_node(flow, step):
             "current": latest_step_task and not latest_step_task.finished_at,
         }
     }
+
+
+def format_step_id(step_id):
+    # email_all_users -> Email all users
+    return step_id.replace("_", " ").title()
