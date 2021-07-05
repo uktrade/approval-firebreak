@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block main_content %}
-<h1 class="govuk-heading-l">Candidates requiring approval</h1>
+<h1 class="govuk-heading-l">Configurable workflow demonstration</h1>
 <a class="govuk-button" href="{% url 'flow-create' %}">Create flow</a>
 <ul class="govuk-list">
     {% for flow in object_list %}
@@ -17,9 +17,7 @@
         </li>
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
     {% empty %}
-        <li><p class="govuk-body">No requirements yet.</p></li>
+        <li><p class="govuk-body">No workflows yet.</p></li>
     {% endfor %}
 </ul>
-
-<a class="govuk-button" href="{% url 'flow-create' %}">Create flow</a>
 {% endblock %}

@@ -11,12 +11,22 @@
   </div>
   <div class="govuk-summary-list__row">
     <dt class="govuk-summary-list__key">
-      Finished
+      Started by
     </dt>
     <dd class="govuk-summary-list__value">
-      {{ object.finished }}
+      {{ object.executed_by.get_full_name }}
     </dd>
   </div>
+  {% if object.finished %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Finished?
+        </dt>
+        <dd class="govuk-summary-list__value">
+          {{ object.finished }}
+        </dd>
+      </div>
+  {% else %}
   <div class="govuk-summary-list__row">
     <dt class="govuk-summary-list__key">
       Status
@@ -25,6 +35,7 @@
       {{ object.nice_name }}
     </dd>
   </div>
+  {% endif %}
 </dl>
 
 {% if object.current_task_record and not task.auto %}
@@ -50,7 +61,7 @@
               "border-style": "solid",
               "border-color": "black",
               shape: 'roundrectangle',
-              width: '220px',
+              width: '234px',
               height: '60px',
               'text-valign': 'center',
               'text-halign': 'center',
@@ -71,26 +82,26 @@
           {
             selector: "node[?start]",
             style: {
-              "background-color": "blue",
+              "background-color": "#5694ca",
               "color": "white",
             },
           },
           {
             selector: "node[?end][?done]",
             style: {
-              "background-color": "green",
+              "background-color": "#00703c",
               "color": "white",
             },
           },
           {
             selector: "node[?decision]",
             style: {
-              "background-color": "purple",
-              "color": "white",
+              shape: 'diamond',
+              height: '100px',
             },
           },
           {
-            selector: "node[?done][!start][!end][!decision]",
+            selector: "node[?done][!start][!end]",
             style: {
               "background-color": "lightgray",
             },
@@ -98,7 +109,9 @@
           {
             selector: "node[?current]",
             style: {
-              "border-width": "8px",
+              "border-width": "4px",
+                "background-color": "#f47738",
+                "color": "white",
             },
           }
         ],

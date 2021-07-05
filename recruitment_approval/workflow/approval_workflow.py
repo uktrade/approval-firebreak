@@ -1,3 +1,5 @@
+# TODO - these imports must not be removed
+# TODO - even though they appear unused
 from recruitment_approval.tasks.create_requirement import (
     CreateRequirement,
     ReviewRequirement,
@@ -14,10 +16,10 @@ ApprovalWorkflow = Workflow(
             step_id="create_requirement",
             task_name="create_requirement",
             start=True,
-            target="find_first_approvers",
+            target="alert_hiring_managers",
         ),
         Step(
-            step_id="find_first_approvers",
+            step_id="alert_hiring_managers",
             task_name="find_approver_recipients",
             target="send_approver_email",
             task_info={"group_name": "Hiring Managers"},

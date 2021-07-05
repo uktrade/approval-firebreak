@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
 from recruitment_approval.models import Requirement
 from workflow.forms import GovFormattedForm
@@ -13,7 +14,16 @@ class HiringManagerApprovalForm(GovFormattedForm):
     )
     rejection_reason = forms.CharField(widget=forms.Textarea, required=False)
 
-    # TODO: custom validation or 2 forms
+    def clean(self):
+        cleaned_data = super().clean()
+        approved = cleaned_data.get("approved")
+        rejection_reason = cleaned_data.get("rejection_reason")
+
+        if not approved and not rejection_reason:
+            raise ValidationError(
+                "You must supply a rejection reason "
+                "when rejecting a requirement"
+            )
 
 
 class HiringManagerApproval(Task, input="hiring_manager_approval"):

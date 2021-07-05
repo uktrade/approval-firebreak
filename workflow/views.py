@@ -1,7 +1,6 @@
 from django.shortcuts import render, reverse, redirect
 from django.http import JsonResponse
 from django.views import View
-from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -10,10 +9,6 @@ from workflow.forms import GovFormattedModelForm
 from workflow.tasks import TaskError
 from workflow.executor import WorkflowExecutor
 from workflow.models import Flow
-
-
-class HomeView(TemplateView):
-    template_name = "workflow/home.html"
 
 
 class FlowListView(ListView):

@@ -2,10 +2,10 @@
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-            Current state
+            Submitted on
         </dt>
         <dd class="govuk-summary-list__value">
-            {{ requirement.nice_name }}
+            {{ requirement.submitted_on }}
         </dd>
     </div>
     <div class="govuk-summary-list__row">
@@ -13,189 +13,133 @@
             Submitted by
         </dt>
         <dd class="govuk-summary-list__value">
-            {{ requirement.hiring_manager.first_name }} {{ requirement.hiring_manager.last_name }}
-        </dd>
-    </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-            Submitted on
-        </dt>
-        <dd class="govuk-summary-list__value">
-            {{ requirement.submitted_on }}
+            {{ requirement.hiring_manager }}
         </dd>
     </div>
 </dl>
 
-<details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          View requirement details
-        </span>
-    </summary>
-    <div class="govuk-details__text">
-        <h2 class="govuk-heading-m">Requirement details</h2>
-        <dl class="govuk-summary-list">
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Group
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.group }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Directorate
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.directorate }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Cost Centre / Team
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.cost_centre_code }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Scope of IR35
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% if requirement.IR35 %}Yes{% else %}No{% endif %}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    New Requirement
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% if requirement.new_requirement %}Yes{% else %}No{% endif %}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Nominated Worker
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.name_of_contractor }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    UK based
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% if requirement.uk_based %}Yes{% else %}No{% endif %}
-                </dd>
-            </div>
-            {% if not requirement.uk_based %}
-                <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Overseas Country
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.overseas_country }}
-                </dd>
-            </div>
-            {% endif %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Anticipated start date
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.start_date }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Anticipated end date
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.end_date }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Level of Security clearance
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.type_of_security_clearance }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Business case
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.part_b_business_case }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Impact
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.part_b_impact }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Main reasons
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {{ requirement.part_b_main_reason }}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Job description submitted
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    {% if requirement.job_description_submitted %}Yes{% else %}No{% endif %}
-                </dd>
-            </div>
-        </dl>
+<h2 class="govuk-heading-m">Requirement details</h2>
+<dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Group
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.group }}
+        </dd>
     </div>
-</details>
-
-<details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          View audit trail
-        </span>
-    </summary>
-    <div class="govuk-details__text">
-        <h2 class="govuk-heading-m">Audit log</h2>
-        {% for audit_item in requirement.audit_log.all %}
-            <dl class="govuk-summary-list">
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        Action at
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ audit_item.action_at }}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        Action
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ audit_item.message }}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row audit-log-item">
-                    <dt class="govuk-summary-list__key">
-                        User
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ audit_item.user.first_name }} {{ audit_item.user.last_name }}
-                    </dd>
-                </div>
-            </dl>
-        {% endfor %}
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Directorate
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.directorate }}
+        </dd>
     </div>
-</details>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Cost Centre / Team
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.cost_centre_code }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Scope of IR35
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {% if requirement.IR35 %}Yes{% else %}No{% endif %}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            New Requirement
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {% if requirement.new_requirement %}Yes{% else %}No{% endif %}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Nominated Worker
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.name_of_contractor }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            UK based
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {% if requirement.uk_based %}Yes{% else %}No{% endif %}
+        </dd>
+    </div>
+    {% if not requirement.uk_based %}
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Overseas Country
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {{ requirement.overseas_country }}
+            </dd>
+        </div>
+    {% endif %}
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Anticipated start date
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.start_date }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Anticipated end date
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.end_date }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Level of Security clearance
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.type_of_security_clearance }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Business case
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.part_b_business_case }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Impact
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.part_b_impact }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Main reasons
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {{ requirement.part_b_main_reason }}
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Job description submitted
+        </dt>
+        <dd class="govuk-summary-list__value">
+            {% if requirement.job_description_submitted %}Yes{% else %}No{% endif %}
+        </dd>
+    </div>
+</dl>

@@ -5,12 +5,13 @@ from django.contrib import admin
 from django.urls import path
 
 import workflow.views as workflow_views
+from recruitment_approval.views import HomeView
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("auth/", include(authbroker_client_urls)),
-    path("", workflow_views.HomeView.as_view(), name="home"),
+    path("", HomeView.as_view(), name="home"),
     path("flow/", workflow_views.FlowListView.as_view(), name="flow-list"),
     path("flow/new", workflow_views.FlowCreateView.as_view(), name="flow-create"),
     path("flow/<int:pk>/", workflow_views.FlowView.as_view(), name="flow"),
