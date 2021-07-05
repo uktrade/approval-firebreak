@@ -35,6 +35,7 @@ class WorkflowExecutor:
                 task_name=current_step.task_name,
                 step_id=current_step.step_id,
                 executed_by=None,
+                finished_at=None,
                 defaults={"task_info": current_step.task_info or {}},
             )
 

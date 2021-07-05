@@ -79,7 +79,7 @@ class FlowDiagramView(View):
 
 
 def workflow_to_cytoscape_elements(flow):
-    nodes = map(step_to_node, flow.workflow.steps)
+    nodes = [step_to_node(flow, step) for step in flow.workflow.steps]
 
     edges = []
     for step in flow.workflow.steps:
@@ -101,18 +101,31 @@ def workflow_to_cytoscape_elements(flow):
     return [*nodes, *edges]
 
 
-def step_to_node(step):
+def step_to_node(flow, step):
+    latest_step_task = (
+        flow.tasks.order_by("started_at").filter(step_id=step.step_id).last()
+    )
+
     targets = []
 
     if step.target:
         targets = step.target if isinstance(step.target, list) else [step.target]
 
+    end = not bool(targets)
+    done = latest_step_task and bool(latest_step_task.finished_at)
+
+    label = step.step_id
+    if end and done:
+        label += " ✓"
+
     return {
         "data": {
             "id": step.step_id,
-            "label": step.step_id,
+            "label": label,
             "start": step.start,
-            "end": not bool(targets),
+            "end": end,
             "decision": len(targets) > 1,
+            "done": done,
+            "current": latest_step_task and not latest_step_task.finished_at,
         }
     }

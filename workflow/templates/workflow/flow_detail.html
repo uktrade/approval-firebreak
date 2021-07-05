@@ -23,22 +23,26 @@
           {
             selector: "node",
             style: {
-              "background-color": "#666",
+              "background-color": "#fff",
+              "border-width": "2px",
+              "border-style": "solid",
+              "border-color": "black",
               shape: 'roundrectangle',
               width: '200px',
               height: '60px',
               'text-valign': 'center',
               'text-halign': 'center',
-              label: "data(id)",
+              label: "data(label)",
             },
           },
           {
             selector: "edge",
             style: {
               width: 3,
-              "line-color": "#ccc",
-              "target-arrow-color": "#ccc",
+              "line-color": "black",
+              "target-arrow-color": "black",
               "target-arrow-shape": "triangle",
+              "arrow-scale": 2,
               "curve-style": "bezier",
             },
           },
@@ -46,18 +50,33 @@
             selector: "node[?start]",
             style: {
               "background-color": "blue",
+              "color": "white",
             },
           },
           {
-            selector: "node[?end]",
+            selector: "node[?end][?done]",
             style: {
-              "background-color": "blue",
+              "background-color": "green",
+              "color": "white",
             },
           },
           {
             selector: "node[?decision]",
             style: {
-              "background-color": "green",
+              "background-color": "purple",
+              "color": "white",
+            },
+          },
+          {
+            selector: "node[?done][!start][!end][!decision]",
+            style: {
+              "background-color": "lightgray",
+            },
+          },
+          {
+            selector: "node[?current]",
+            style: {
+              "border-width": "8px",
             },
           }
         ],
