@@ -21,8 +21,7 @@ class HiringManagerApprovalForm(GovFormattedForm):
 
         if not approved and not rejection_reason:
             raise ValidationError(
-                "You must supply a rejection reason "
-                "when rejecting a requirement"
+                "You must supply a rejection reason " "when rejecting a requirement"
             )
 
 
@@ -37,6 +36,10 @@ class HiringManagerApproval(Task, input="hiring_manager_approval"):
         if not form.is_valid():
             # TODO: how to display form with errors
             raise TaskError("Form is not valid", {"form": form})
+
+        self.flow.flow_info["rejection_reason"] = form.cleaned_data.get(
+            "rejection_reason"
+        )
 
         target = (
             "hiring_approved" if form.cleaned_data["approved"] else "hiring_rejected"

@@ -66,7 +66,6 @@ class CreateRequirement(Task, input="create_requirement"):
             raise TaskError("Form is not valid", {"form": form})
 
         self.flow.flow_info["requirement_id"] = str(form.instance.pk)
-        self.flow.flow_info["requirement_url"] = "https://www.google.com"
 
         return None, form.cleaned_data
 

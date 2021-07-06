@@ -30,7 +30,7 @@ ApprovalWorkflow = Workflow(
             target="hiring_manager_approval",
             task_info={
                 "subject": "Hiring manager approval required",
-                "message": "You can view the requirement at {{ requirement_url }} and continue it at {{ flow.continue_url }}",
+                "message": "You can view the requirement at {{ flow.continue_url }}.",
                 "from_email": "system@example.com",
             },
         ),
@@ -51,7 +51,7 @@ ApprovalWorkflow = Workflow(
             target=None,
             task_info={
                 "subject": "Hiring approved",
-                "message": "You can view the requirement at {{ requirement_url }} and continue it at {{ flow.continue_url }}",
+                "message": "This requirement has been approved!",
                 "from_email": "system@example.com",
             },
         ),
@@ -67,7 +67,7 @@ ApprovalWorkflow = Workflow(
             target="review_requirement",
             task_info={
                 "subject": "Hiring rejected",
-                "message": "You can view the requirement at {{ requirement_url }} and continue it at {{ flow.continue_url }}",
+                "message": "Your requirement has been rejected for the following reason:\n{{ rejection_reason }}\n\nPlease amend your requirement at {{ flow.continue_url }}.",
                 "from_email": "system@example.com",
             },
         ),
@@ -89,7 +89,7 @@ ApprovalWorkflow = Workflow(
             target="hiring_manager_approval",
             task_info={
                 "subject": "Requirement reviewed",
-                "message": "I have reviewed the requirement at {{ requirement_url }} please check it over at {{ flow.continue_url }}",
+                "message": "This requirement has been amended and is ready for review at {{ flow.continue_url }}.",
                 "from_email": "system@example.com",
             },
         ),

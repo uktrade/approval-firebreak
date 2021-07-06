@@ -27,3 +27,5 @@ media/
 # IDE
 .idea/
 .vscode/
+
+app-messages/
